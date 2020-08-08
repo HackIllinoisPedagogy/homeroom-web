@@ -7,9 +7,9 @@ import "firebase/firestore";
 
 function LogIn() {
 
-    const {error, setError} = useState(<div/>);
-    let email = "";
-    let password = "";
+    const [errorDiv, setErrorDiv] = useState(<div/>);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     if (firebase.apps.length === 0) {
         const firebaseConfig = {
@@ -31,9 +31,11 @@ function LogIn() {
 
     const makeErrorDiv = function (message) {
         return (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <div className="w-1/3 self-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                 <span className="block sm:inline">{message}</span>
-                <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
+                <span className="absolute top-0 bottom-0 right-0 px-4 py-3"
+                      onClick={() => setErrorDiv(<div/>)}
+                >
                     <svg className="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg"
          viewBox="0 0 20 20">
                         <title>Close</title>
@@ -67,18 +69,22 @@ function LogIn() {
                     <div className="flex items-center border-b border-purple-500 py-2">
                         <input
                             className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
-                            type="text" placeholder="Email" aria-label="email" onChange={event => email = event.target.value}/>
+                            type="email" placeholder="Email" aria-label="email" value={email} onChange={event => setEmail(event.target.value)}/>
                     </div>
                     <div className="flex items-center border-b border-purple-500 py-2">
                         <input
                             className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
-                            type="text" placeholder="Password" aria-label="password" onChange={event => password = event.target.value}/>
+                            type="password" placeholder="Password" aria-label="password" value={password} onChange={event => setPassword(event.target.value)}/>
                     </div>
                 </form>
                 <button
                     className="self-center w-1/3 rounded bg-purple-500 hover:bg-purple-700 border-purple-500 hover:border-purple-700 mt-3 py-1 px-2 border-4 text-sm text-white hover:shadow-inner"
                     onClick={() => {
-
+                        auth.signInWithEmailAndPassword(email, password).then(() => {
+                            alert("Sign in successful");
+                        }).catch((error) => {
+                            setErrorDiv(makeErrorDiv(error.message));
+                        })
                     }}>
                     Log In
                 </button>
@@ -86,7 +92,7 @@ function LogIn() {
                     className="my-3 self-center w-1/3 rounded bg-orange-500 hover:bg-orange-700 border-orange-500 hover:border-orange-700 py-1 px-2 border-4 text-sm text-white hover:shadow-inner">
                     No account? Sign up!
                 </button>
-                {error}
+                {errorDiv}
             </div>
         </div>
     );
