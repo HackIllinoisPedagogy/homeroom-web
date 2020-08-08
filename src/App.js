@@ -15,8 +15,6 @@ import Assignment, { ProblemSet } from './components/assignment/Assignment'
 
 function App() {
 
-  let p = new ProblemSet();
-
   return (
     <Router>
       <Switch>
@@ -24,7 +22,6 @@ function App() {
         <Route path="/signup" component={SignUp}>
         </Route>
         <Route path="/dashboard" component={Dashboard}></Route>
-        <Route path="/assignment" render={() => <Assignment problemSet={p}/>}></Route>
       </Switch>
     </Router>
   );

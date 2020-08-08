@@ -280,7 +280,7 @@ class Sidebar extends Component {
                             <p>{name}</p>
                         </li>
                         <li class="my-px">
-                            <a href="#"
+                            <a
                                class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 bg-gray-100">
                                 <span class="flex items-center justify-center text-lg text-gray-400">
                                     <svg fill="none"
@@ -305,20 +305,24 @@ class Sidebar extends Component {
                                 className="flex font-medium text-sm text-gray-400 px-2 my-4 uppercase">My Assignments</span>
                         </li>
 
-                        {getAssignments().map(assignment => {
-                            const {name} = assignment;
-                            return (<li class="my-px" key={name}>
-                                <a href="#"
-                                   class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-gray-100">
-                                    <span class="ml-3">{name}</span>
-                                </a>
-                            </li>);
-                        })
-
+                        {
+                            Object.values(getAssignments()).map(assignment => {
+                                const{id, name} = assignment;
+                                return(
+                                    <li class="my-px" key={id}>
+                                        <a onClick={() => {
+                                            this.props.setAssignment(id);
+                                            this.props.setChat('');   
+                                        }}
+                                            class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-gray-100">
+                                            <span className="ml-3">{name}</span>
+                                        </a>
+                                    </li>);
+                            })
                         }
 
                         <li class="my-px">
-                            <a href="#"
+                            <a 
                                class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-gray-100">
                                 <span class="flex items-center justify-center text-lg text-green-400">
                                     <svg fill="none"
@@ -357,7 +361,7 @@ class Sidebar extends Component {
                         }
 
                         <li class="my-px">
-                            <a href="#"
+                            <a
                                class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-gray-100">
                                 <span class="flex items-center justify-center text-lg text-red-400"
                                       onClick={() => {

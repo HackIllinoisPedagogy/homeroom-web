@@ -20,6 +20,7 @@ class Chat extends Component {
         return Object.values(messages).map(message => {
             return <Message message={message} />
         });
+        
 
 
     }

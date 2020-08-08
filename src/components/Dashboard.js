@@ -3,14 +3,14 @@ import { slide as Menu } from 'react-burger-menu';
 import Sidebar from './sidebar/Sidebar';
 import Chat from './chat/Chat';
 import {auth} from "../services/firebase";
-
-
+import Assignment from "./assignment/Assignment";
 
 
 class Dashboard extends Component {
 
     state = {
         activeChatId: '',
+        activeAssignemntId: '',
         user: null,
     }
 
@@ -18,7 +18,14 @@ class Dashboard extends Component {
         this.setState({ activeChatId: id })
     }
 
+    setAssignment = (id) => {
+        this.setState({activeAssignemntId: id})
+    }
+
+    
+
     setUser = user => this.setState({user: user});
+
     componentDidMount() {
         auth.onAuthStateChanged(user => {
             if(user) {
@@ -30,11 +37,23 @@ class Dashboard extends Component {
     }
 
     render() {
+
+        let display;
+        if(this.state.activeChatId != ''){
+            display = <Chat activeChatId={this.state.activeChatId} />
+            
+        }
+        else if(this.state.activeAssignmentId != ''){
+            display = <Assignment activeAssignmentId={this.state.activeAssignemntId} />
+            
+        }
+        // add for All Class once Firebase is in
+
         return (
             <div>
-                <Sidebar user={this.state.user} setChat={this.setChat} history={this.props.history} />
+                <Sidebar user={this.state.user} setChat={this.setChat} setAssignment = {this.setAssignment} history={this.props.history} />
                 <div id="dashboard-inner-container">
-                    <Chat activeChatId={this.state.activeChatId} />
+                    {display}
                 </div>
             </div>
 
