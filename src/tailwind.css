@@ -1,3 +1,21 @@
+
+
+@font-face {
+  font-family: 'cera-regular';
+  src: url(./fonts/cera/Cera-Pro-Regular.ttf);
+}
+
+@font-face {
+  font-family: 'cera-medium';
+  src: url(./fonts/cera/Cera-Pro-Medium.otf);
+}
+
+@font-face {
+  font-family: 'cera-black';
+  src: url(./fonts/cera/Cera-Pro-Black.otf);
+}
+
+
 /*noinspection CssInvalidAtRule*/
 
 /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
