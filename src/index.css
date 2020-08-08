@@ -1,18 +1,26 @@
-@tailwind base;
-
-@tailwind components;
-
 @font-face {
-  font-family: 'Cera Pro Regular';
-  src: local('Roboto'), url(./fonts/cera/Cera-Pro-Medium.otf) format('otf');
+  font-family: 'circular-book';
+  src: url(./fonts/circular/lineto-circular-pro-book.ttf);
 }
 
-@tailwind utilities;
+@font-face {
+  font-family: 'circular-medium';
+  src: url(./fonts/circular/lineto-circular-pro-medium.ttf);
+}
 
+@font-face {
+  font-family: 'circular-bold';
+  src: url(./fonts/circular/lineto-circular-pro-bold.ttf);
+}
+
+@font-face {
+  font-family: 'circular-black';
+  src: url(./fonts/circular/lineto-circular-black.ttf);
+}
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'circular-book', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -122,4 +130,16 @@ Note: Beware of modifying this element as it can break the animations - you shou
   background-color: #BDBDBD;
   border-radius: 10px;
 
+}
+
+#message-recieved {
+  background-color: #E3EAF2;
+  float: left;
+
+}
+
+#message-sent {
+  background-color: #7754F8;
+  color: white;
+  float: right;
 }
