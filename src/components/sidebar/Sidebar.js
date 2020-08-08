@@ -86,7 +86,7 @@ class Sidebar extends Component {
                                     </h3>
                                 <div className="mt-2">
                                     <p className="text-sm leading-5 text-gray-500">
-                                        Create a className and share the code we generate with your students!
+                                        Create a class and share the code we generate with your students!
                                         </p>
                                 </div>
                                 <div className="mt-2">
@@ -218,6 +218,7 @@ class Sidebar extends Component {
                                 <span className="flex items-center justify-center text-sm text-gray-500 font-semibold bg-gray-200 h-6 px-2 rounded-full ml-auto">3</span>
                             </a>
                         </li>
+
                         <li className="my-px">
                             <span className="flex font-medium text-sm text-gray-400 px-2 my-4 uppercase">My Assignments</span>
                         </li>
