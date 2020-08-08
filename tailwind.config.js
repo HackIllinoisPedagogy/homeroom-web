@@ -2,7 +2,9 @@ module.exports = {
   purge: [],
   theme: {
     colors: {
-      red: '#E3EAF2',
+      purp: {
+        100: '#7754F8'
+      },
     },
     extend: {},
   },
