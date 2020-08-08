@@ -47,9 +47,9 @@ class Sidebar extends Component {
 
     renderMainSidebar() {
         return (
-            <div class="absolute overflow-hidden shadow-lg bg-white mb-4 border-red-light w-full h-screen z-10 md:w-1/5 ml-24">
-                <div class="flex w-full max-w-xs p-4 bg-white">
-                    <ul class="flex flex-col w-full">
+            <div style={{width: '300px'}} class="absolute overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
+                <div class="flex max-w-xs p-4 bg-white">
+                    <ul class="flex flex-col">
                         <li class="h-20 my-px">
                             <h1>APCS Period 3</h1>
                             <p>Eric Ferrante</p>

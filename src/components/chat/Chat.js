@@ -52,7 +52,7 @@ class Chat extends Component {
                             {this.renderChatHistory()}
                         </div>
                         <div class="row-span-1 ">
-                            <form onSubmit={this.addMessage} class="absolute inset-x-10 bottom-10 w-4/12">
+                            <form onSubmit={this.addMessage} class="absolute inset-x-10 bottom-10 w-4/12 mx-auto">
                                 <div style={{ borderColor: '#7754F8' }} class="flex items-center border-b border-teal-500 p-8 rounded shadow bg-white py-2">
                                     <input class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Send a message..." onChange={(e) => this.setState({ message: e.target.value })} />
                                     <button style={{ borderColor: '#7754F8', backgroundColor: '#7754F8' }} class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">

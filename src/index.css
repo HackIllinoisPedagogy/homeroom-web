@@ -131,3 +131,15 @@ Note: Beware of modifying this element as it can break the animations - you shou
   border-radius: 10px;
 
 }
+
+#message-recieved {
+  background-color: #E3EAF2;
+  float: left;
+
+}
+
+#message-sent {
+  background-color: #7754F8;
+  color: white;
+  float: right;
+}

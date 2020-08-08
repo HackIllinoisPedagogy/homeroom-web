@@ -5,7 +5,7 @@ const Message = (props) => {
 
 
     return (
-        <div class="p-8 ">
+        <div class="p-8">
             <div id={sentByMe ? "message-sent" : "message-recieved"} class='rounded-lg'>
                 <div class="p-5 ">
                     <p class="text-base">{body}</p>
