@@ -238,7 +238,7 @@ class Sidebar extends Component {
             classes = this.state.doc.classes.map(c => {
                 return (
                     <li>
-                        <ClassSelector name={c.name}/>
+                        <ClassSelector name={c.name} code={c.code} setClass={this.props.setClass} currentClass={this.props.currentClass}/>
                     </li>
                 )
             });
@@ -286,6 +286,8 @@ class Sidebar extends Component {
                     <ul class="flex flex-col">
                         <li class="h-20 my-px">
                             <p>{name}</p>
+                            <p>Currently looking at {this.props.currentClass.name}</p>
+                            <p>Class Code: {this.props.currentClass.code}</p>
                         </li>
                         <li class="my-px">
                             <a href="#"
@@ -321,9 +323,7 @@ class Sidebar extends Component {
                                     <span class="ml-3">{name}</span>
                                 </a>
                             </li>);
-                        })
-
-                        }
+                        })}
 
                         <li class="my-px">
                             <a href="#"

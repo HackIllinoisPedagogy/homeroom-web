@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { slide as Menu } from 'react-burger-menu';
 import Sidebar from './sidebar/Sidebar';
 import Chat from './chat/Chat';
-import {auth} from "../services/firebase";
+import {auth, db} from "../services/firebase";
 
 
 
@@ -12,7 +12,7 @@ class Dashboard extends Component {
     state = {
         activeChatId: '',
         user: null,
-        currentClass: ''
+        currentClass: 0
     }
 
     setClass = c => this.setState({currentClass: c});
@@ -25,6 +25,16 @@ class Dashboard extends Component {
     componentDidMount() {
         auth.onAuthStateChanged(user => {
             if(user) {
+                db.collection("users").doc(user.uid).get().then(doc => {
+                    if(doc.data().classes.length >= 0) {
+                        this.setState({
+                            user: user,
+                            currentClass: doc.data().classes[0],
+                        })
+                    } else {
+                        this.setUser(user);
+                    }
+                })
                 this.setUser(user);
             } else {
                 this.props.history.push('/');
