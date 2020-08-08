@@ -1,9 +1,23 @@
 const data = {
     assignments: [
-        { name: 'Problem Set #1' },
-        { name: 'Problem Set #2' },
-        { name: 'Geometry Practice' },
-        { name: 'Recursion Practice' },
+        {
+            id: 'assignment1',
+            name: 'Problem Set #1',
+
+        },
+        {
+            id: 'assignment2',
+            name: 'Problem Set #2'
+        },
+        {
+            id: 'geoSet',
+            name: 'Geometry Problems'
+        },
+        {
+            id: 'algebraSet',
+            name: 'Algebra Problems'
+        }
+        
     ],
     conversations: {
         conv1: {
