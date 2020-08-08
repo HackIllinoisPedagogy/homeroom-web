@@ -5,7 +5,6 @@ import {
   Switch,
   Redirect,
 } from "react-router-dom";
-import './App.css';
 import LogIn from './components/auth/LogIn';
 import Dashboard from './components/Dashboard';
 
