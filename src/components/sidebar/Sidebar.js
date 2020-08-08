@@ -218,14 +218,9 @@ class Sidebar extends Component {
                                 <span class="flex items-center justify-center text-sm text-gray-500 font-semibold bg-gray-200 h-6 px-2 rounded-full ml-auto">3</span>
                             </a>
                         </li>
-<<<<<<< HEAD
 
                         <li className="my-px">
                             <span className="flex font-medium text-sm text-gray-400 px-2 my-4 uppercase">My Assignments</span>
-=======
-                        <li class="my-px">
-                            <span class="flex font-medium text-sm text-gray-400 px-2 my-4 uppercase">My Assignments</span>
->>>>>>> parent of bee1da4... Sidebar CSS fixed: (class now replaced with className)
                         </li>
 
                         {getAssignments().map(assignment => {
