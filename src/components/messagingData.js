@@ -1,24 +1,10 @@
 const data = {
-    assignments: {
-        assignment1: {
-            id: 'assignment1',
-            name: 'Problem Set #1',
-
-        },
-        assignment2: {
-            id: 'assignment2',
-            name: 'Problem Set #2'
-        },
-        geometrySet: {
-            id: 'geoSet',
-            name: 'Geometry Problems'
-        },
-        algebraSet: {
-            id: 'algebraSet',
-            name: 'Algebra Problems'
-        }
-        
-    },
+    assignments: [
+        { name: 'Problem Set #1' },
+        { name: 'Problem Set #2' },
+        { name: 'Geometry Practice' },
+        { name: 'Recursion Practice' },
+    ],
     conversations: {
         conv1: {
             id: 'conv1',
