@@ -1,5 +1,7 @@
+/*noinspection CssInvalidAtRule*/
 @tailwind base;
 
+/*noinspection CssInvalidAtRule*/
 @tailwind components;
 
 @font-face {
@@ -7,6 +9,7 @@
   src: local('Roboto'), url(./fonts/cera/Cera-Pro-Medium.otf) format('otf');
 }
 
+/*noinspection CssInvalidAtRule*/
 @tailwind utilities;
 
 
