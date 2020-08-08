@@ -1,19 +1,26 @@
 
 
 @font-face {
-  font-family: 'cera-regular';
-  src: url(./fonts/cera/Cera-Pro-Regular.ttf);
+  font-family: 'circular-book';
+  src: url(./fonts/circular/lineto-circular-pro-book.ttf);
 }
 
 @font-face {
-  font-family: 'cera-medium';
-  src: url(./fonts/cera/Cera-Pro-Medium.otf);
+  font-family: 'circular-medium';
+  src: url(./fonts/circular/lineto-circular-pro-medium.ttf);
 }
 
 @font-face {
-  font-family: 'cera-black';
-  src: url(./fonts/cera/Cera-Pro-Black.otf);
+  font-family: 'circular-bold';
+  src: url(./fonts/circular/lineto-circular-pro-bold.ttf);
 }
+
+@font-face {
+  font-family: 'circular-black';
+  src: url(./fonts/circular/lineto-circular-black.ttf);
+}
+
+
 
 
 /*noinspection CssInvalidAtRule*/
@@ -42,6 +49,7 @@ html {
 
 body {
   margin: 0;
+  font-family: 'circular-book';
 }
 
 /**

@@ -8,13 +8,21 @@ import Chat from './chat/Chat';
 
 class Dashboard extends Component {
 
+    state = {
+        activeChatId: ''
+    }
+
+    setChat = (id) => {
+        this.setState({ activeChatId: id })
+    }
+
 
     render() {
         return (
             <div>
-                <Sidebar />
+                <Sidebar setChat={this.setChat} history={this.props.history} />
                 <div id="dashboard-inner-container">
-                    <Chat />
+                    <Chat activeChatId={this.state.activeChatId} />
                 </div>
             </div>
 
