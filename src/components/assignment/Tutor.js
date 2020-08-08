@@ -3,15 +3,60 @@ import "../../tailwind.css"
 
 
 class Tutor extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			solution: props.problem.solution,
+			hint: <div></div>,
+		};
+		this.serverUrl = "http://127.0.0.1:5000/";
+	}
+
+	handleClick() {
+		let data = {"state": document.getElementById("user-state").value};
+
+		let query = Object.keys(data)
+             .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(data[k]))
+             .join('&');
+
+		fetch(this.serverUrl + "get_hint?" + query)
+			.then(res => res.json())
+			.then(
+				(result) => {
+					console.log(result.hint);
+
+					let h = (
+						<div id="hint-box" className="w-full bg-white h-auto shadow-md rounded mt-5 p-5">
+							{result.hint}
+						</div>
+					);
+
+					this.setState({
+						solution: this.state.solution,
+						hint: h,
+					});
+				},
+
+				(error) => {
+					console.log(error);
+				}
+			);
+	}
+
 	render() {
 		return (
 			<div id="tutor" className="w-3/5">
 				<h3 id="tutor-name" className="text-xl font-semibold"> Ask Polya </h3>
-				<div id="accent" className="h-1 w-1/4 bg-purple-700 mt-1"></div>
+				<div id="accent" className="h-1 w-1/4 bg-custom-purple mt-1"></div>
 				<form id="user-input" className="mt-5">
-					<textarea id="user-state" class="text-gray-700 focus:outline-none w-full h-full pl-2 pt-2 bg-white shadow-md rounded"
-					 	id="user_state" type="text" rows="10" placeholder="What have you tried so far to solve the problem?"/>
+					<textarea id="user-state" className="text-gray-700 focus:outline-none w-full h-full pl-3 pt-3 bg-white shadow-md rounded"
+						type="text" rows="7" placeholder="What have you tried so far to solve the problem?"/>
 				</form>
+				<div id="button-container" className="w-full h-auto flex pt-5 justify-end">
+					<button id="submit-hint-request" className="bg-custom-purple text-gray-100 w-1/5 shadow-md text-center h-8"
+						onClick={() => this.handleClick()}> Ask </button>
+				</div>
+				{this.state.hint}
 			</div>
 		);
 	}
