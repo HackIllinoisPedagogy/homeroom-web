@@ -178,17 +178,26 @@ class Sidebar extends Component {
                                     onClick={() => {
                                         db.collection("classes").doc(this.state.className).get().then(doc => {
                                             if (doc.exists) {
-                                                db.collection("users").doc(this.props.user.uid).update({
-                                                    classes: firebase.firestore.FieldValue.arrayUnion(`${this.state.className} ${doc.data().name}`),
-                                                }).then(() => {
-                                                    db.collection("users").doc(this.props.user.uid).get().then(doc2 => {
-                                                        this.setState({
-                                                            doc: doc2.data(),
-                                                            addClassModal: false,
-                                                            className: ""
+                                                if(!doc.data().members.includes(this.props.user.uid)) {
+                                                    db.collection("classes").doc(this.state.className).update({
+                                                        members: firebase.firestore.FieldValue.arrayUnion(this.props.user.uid),
+                                                    }).then(() => {
+                                                        db.collection("users").doc(this.props.user.uid).update({
+                                                            classes: firebase.firestore.FieldValue.arrayUnion(`${this.state.className} ${doc.data().name}`),
+                                                        }).then(() => {
+                                                            db.collection("users").doc(this.props.user.uid).get().then(doc2 => {
+                                                                this.setState({
+                                                                    doc: doc2.data(),
+                                                                    addClassModal: false,
+                                                                    className: ""
+                                                                })
+                                                            })
                                                         })
-                                                    })
-                                                })
+                                                    });
+                                                } else {
+                                                    alert("You are already in this class");
+                                                }
+
                                             } else {
                                                 alert("Invalid Class Code");
                                             }
