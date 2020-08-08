@@ -112,7 +112,10 @@ class Sidebar extends Component {
                                             members: [this.props.user.uid]
                                         }).then(() => {
                                             db.collection("users").doc(this.props.user.uid).update({
-                                                classes: firebase.firestore.FieldValue.arrayUnion(`${code} ${this.state.className}`),
+                                                classes: firebase.firestore.FieldValue.arrayUnion({
+                                                    code: code,
+                                                    name: this.state.className,
+                                                }),
                                             }).then(() => {
                                                 db.collection("users").doc(this.props.user.uid).get().then(doc => {
                                                     this.setState({
@@ -183,7 +186,10 @@ class Sidebar extends Component {
                                                         members: firebase.firestore.FieldValue.arrayUnion(this.props.user.uid),
                                                     }).then(() => {
                                                         db.collection("users").doc(this.props.user.uid).update({
-                                                            classes: firebase.firestore.FieldValue.arrayUnion(`${this.state.className} ${doc.data().name}`),
+                                                            classes: firebase.firestore.FieldValue.arrayUnion({
+                                                                code: this.state.className,
+                                                                name: doc.data().name
+                                                            }),
                                                         }).then(() => {
                                                             db.collection("users").doc(this.props.user.uid).get().then(doc2 => {
                                                                 this.setState({
@@ -258,7 +264,12 @@ class Sidebar extends Component {
 
     renderMainSidebar() {
         const name = this.state.doc ? this.state.doc.name : "";
-        const classes = this.state.doc ? this.state.doc.classes : "";
+        let classes;
+        if (this.state.doc) {
+            classes = this.state.doc.classes.map(c => <div>{c.name}, Code: {c.code}</div>);
+        } else {
+            classes = <div/>;
+        }
         return (
             <div style={{width: '300px'}}
                  class="absolute overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
