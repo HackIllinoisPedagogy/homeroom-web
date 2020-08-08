@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import LogIn from './components/auth/LogIn';
 import Dashboard from './components/Dashboard';
+import SignUp from "./components/auth/SignUp";
 
 
 function App() {
@@ -14,6 +15,9 @@ function App() {
     <Router>
       <Switch>
         <Route exact path="/" component={LogIn}></Route>
+        <Route path="/signup">
+          <SignUp/>
+        </Route>
         <Route path="/dashboard" component={Dashboard}></Route>
       </Switch>
     </Router>

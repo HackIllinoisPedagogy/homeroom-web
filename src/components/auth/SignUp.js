@@ -4,14 +4,16 @@ import Logo from "../Logo";
 
 import "firebase/auth";
 import "firebase/firestore";
-import {auth} from "../../services/firebase";
+import {auth, db} from "../../services/firebase";
 import {Link} from "react-router-dom";
 
-function LogIn() {
+function SignUp() {
 
     const [errorDiv, setErrorDiv] = useState(<div/>);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [name, setName] = useState("");
+    const [isStudent, setIsStudent] = useState(true);
 
     const img = new Image();
     img.src = "../../images/logo.svg";
@@ -51,40 +53,62 @@ function LogIn() {
             </div>
             <div className="w-full justify-center flex flex-col  p-3" style={{'height': '90%',}}>
                 <span className="w-1/3 self-center font-bold text-3xl text-center mb-10">
-                    Welcome back!
+                    New? Sign Up Here!
                 </span>
                 <form className="w-1/3 self-center">
-                    <div className="flex items-center border-b border-p-purple py-2">
+                    <div className="flex items-center border-b border-p-orange py-2">
+                        <input
+                            className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
+                            type="text" placeholder="Name" aria-label="name" value={name}
+                            onChange={event => setName(event.target.value)}/>
+                    </div>
+                    <div className="flex items-center border-b border-p-orange py-2">
                         <input
                             className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
                             type="email" placeholder="Email" aria-label="email" value={email}
                             onChange={event => setEmail(event.target.value)}/>
                     </div>
-                    <div className="flex items-center border-b border-p-purple py-2">
+                    <div className="flex items-center border-b border-p-orange py-2">
                         <input
                             className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
                             type="password" placeholder="Password" aria-label="password" value={password}
                             onChange={event => setPassword(event.target.value)}/>
                     </div>
+                    <div className="flex justify-center items-center py-2">
+                        <input type="checkbox" className="mr-3" value="Teacher"
+                               onChange={() => setIsStudent(!isStudent)}/>
+                        <label className="text-p-orange text-xl"> I am a <strong>teacher</strong></label>
+                    </div>
                 </form>
                 <button
-                    className="self-center w-1/3 rounded bg-p-purple hover:bg-purple-700 border-p-purple hover:border-purple-700 mt-3 py-1 px-2 border-4 text-sm text-white hover:shadow-inner"
+                    className="self-center w-1/3 rounded bg-p-orange hover:bg-orange-700 border-p-orange hover:border-orange-700 mt-3 py-1 px-2 border-4 text-sm text-white hover:shadow-inner"
                     onClick={() => {
-                        auth.signInWithEmailAndPassword(email, password).then(() => {
-                            alert("Sign in successful");
-                        }).catch((error) => {
+                        auth.createUserWithEmailAndPassword(email, password).then(() => {
+                            const role = isStudent ? "student" : "teacher";
+                            db.collection("users").doc(auth.currentUser.uid).set(
+                                {
+                                    role: role,
+                                    classes: [],
+                                    name: name
+                                }
+                            ).then(() => {
+                                auth.signInWithEmailAndPassword(email, password).then(() => {
+                                    alert("Sign up complete!");
+                                });
+                            })
+                        }).catch(error => {
                             setErrorDiv(makeErrorDiv(error.message));
                         })
                     }}>
-                    Log In
+                    Sign Up!
                 </button>
                 <button
-                    className="my-3 self-center w-1/3 rounded bg-p-orange hover:bg-orange-700 border-p-orange hover:border-orange-700 py-1 px-2 border-4 text-sm text-white hover:shadow-inner"
+                    className="my-3 self-center w-1/3 rounded bg-p-purple hover:bg-purple-700 border-p-purple hover:border-purple-  700 py-1 px-2 border-4 text-sm text-white hover:shadow-inner"
                     onClick={() => {
-                        window.location.pathname = "/signup"
+                        window.location.pathname = "/"
                     }}
                 >
-                    No account? Sign up!
+                    Have an Account? Log In!
                 </button>
                 {errorDiv}
             </div>
@@ -92,4 +116,4 @@ function LogIn() {
     );
 }
 
-export default LogIn;
+export default SignUp;

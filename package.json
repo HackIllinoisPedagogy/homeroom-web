@@ -18,6 +18,7 @@
     "tailwindcss": "^1.6.2"
   },
   "scripts": {
+    "build:css": "postcss src/tailwind-settings.css -o src/tailwind.css",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
