@@ -16,8 +16,8 @@ class Tutor extends React.Component {
 		let data = {"state": document.getElementById("user-state").value};
 
 		let query = Object.keys(data)
-             .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(data[k]))
-             .join('&');
+			.map(k => encodeURIComponent(k) + '=' + encodeURIComponent(data[k]))
+			.join('&');
 
 		fetch(this.serverUrl + "get_hint?" + query)
 			.then(res => res.json())
@@ -50,11 +50,11 @@ class Tutor extends React.Component {
 				<div id="accent" className="h-1 w-1/4 bg-custom-purple mt-1"></div>
 				<form id="user-input" className="mt-5">
 					<textarea id="user-state" className="text-gray-700 focus:outline-none w-full h-full pl-3 pt-3 bg-white shadow-md rounded"
-						type="text" rows="7" placeholder="What have you tried so far to solve the problem?"/>
+							  type="text" rows="7" placeholder="What have you tried so far to solve the problem?"/>
 				</form>
 				<div id="button-container" className="w-full h-auto flex pt-5 justify-end">
 					<button id="submit-hint-request" className="bg-custom-purple text-gray-100 w-1/5 shadow-md text-center h-8"
-						onClick={() => this.handleClick()}> Ask </button>
+							onClick={() => this.handleClick()}> Ask </button>
 				</div>
 				{this.state.hint}
 			</div>
