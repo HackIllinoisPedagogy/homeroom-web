@@ -23,6 +23,14 @@ export const getConversations = () => {
     return data.conversations;
 }
 
+export const getConversationsById = (id) => {
+    const conversation = {
+        id: data.conversations[id].id,
+        name: data.conversations[id].name
+    }
+    return conversation;
+}
+
 export const addMessageToConversation = (id, message) => {
     return data.conversations[id].messages.push(message);
 }

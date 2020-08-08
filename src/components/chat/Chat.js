@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { addMessageToConversation, getMessagesFromConversation } from '../messagingData';
+import { addMessageToConversation, getMessagesFromConversation, getConversationsById } from '../messagingData';
 import Message from './Message';
 
 
@@ -42,12 +42,15 @@ class Chat extends Component {
         }
 
 
-
-
         return (
             <div>
                 <div class="flex mb-4 h-screen w-full">
-                    <div class="w-5/6 grid grid-rows-5 grid-flow-col gap-4">
+                    <div class="mt-10  w-5/6 grid grid-rows-6 grid-flow-col gap-4">
+                        <div class="row-span-1">
+                            <span className="text-3xl font-bold">
+                                {getConversationsById(activeChatId).name}
+                            </span>
+                        </div>
                         <div class="row-span-4">
                             {this.renderChatHistory()}
                         </div>
