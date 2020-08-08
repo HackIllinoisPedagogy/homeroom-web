@@ -12,7 +12,7 @@ class Dashboard extends Component {
         activeChatId: '',
         activeAssignemntId: '',
         user: null,
-        currentClass: 0
+        currentClass: null,
     }
 
     setClass = c => this.setState({currentClass: c});

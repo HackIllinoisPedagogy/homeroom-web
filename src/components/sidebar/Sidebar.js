@@ -278,7 +278,8 @@ class Sidebar extends Component {
 
     renderMainSidebar() {
         const name = this.state.doc ? this.state.doc.name : "";
-
+        const classDiv = this.props.currentClass ? <p>Currently looking at {this.props.currentClass.name}</p>: <p/>;
+        const codeDiv = this.props.currentClass ? <p>Currently looking at {this.props.currentClass.code}</p>: <p/>;
         return (
             <div style={{ width: '300px' }}
                 class="absolute overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
@@ -286,8 +287,8 @@ class Sidebar extends Component {
                     <ul class="flex flex-col">
                         <li class="h-20 my-px">
                             <p>{name}</p>
-                            <p>Currently looking at {this.props.currentClass.name}</p>
-                            <p>Class Code: {this.props.currentClass.code}</p>
+                            {classDiv}
+                            {codeDiv}
                         </li>
                         <li class="my-px">
                             <a
