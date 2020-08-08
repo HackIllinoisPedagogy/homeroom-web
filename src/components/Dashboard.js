@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { slide as Menu } from 'react-burger-menu';
 import Sidebar from './sidebar/Sidebar';
 import Chat from './chat/Chat';
-import {auth} from "../services/firebase";
+import {auth, db} from "../services/firebase";
 import Assignment from "./assignment/Assignment";
 
 
@@ -12,7 +12,10 @@ class Dashboard extends Component {
         activeChatId: '',
         activeAssignemntId: '',
         user: null,
+        currentClass: 0
     }
+
+    setClass = c => this.setState({currentClass: c});
 
     setChat = (id) => {
         this.setState({ activeChatId: id })
@@ -29,6 +32,16 @@ class Dashboard extends Component {
     componentDidMount() {
         auth.onAuthStateChanged(user => {
             if(user) {
+                db.collection("users").doc(user.uid).get().then(doc => {
+                    if(doc.data().classes.length >= 0) {
+                        this.setState({
+                            user: user,
+                            currentClass: doc.data().classes[0],
+                        })
+                    } else {
+                        this.setUser(user);
+                    }
+                })
                 this.setUser(user);
             } else {
                 this.props.history.push('/');
@@ -51,7 +64,7 @@ class Dashboard extends Component {
 
         return (
             <div>
-                <Sidebar user={this.state.user} setChat={this.setChat} setAssignment = {this.setAssignment} history={this.props.history} />
+                <Sidebar user={this.state.user} setChat={this.setChat} setAssignment={this.setAssignment} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
                 <div id="dashboard-inner-container">
                     {display}
                 </div>
