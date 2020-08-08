@@ -21,3 +21,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.idea/misc.xml
+.idea/modules.xml
+.idea/pedagogy-web.iml
+.idea/vcs.xml
+.idea/workspace.xml
