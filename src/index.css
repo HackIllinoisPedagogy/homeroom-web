@@ -1,5 +1,7 @@
+/*noinspection CssInvalidAtRule*/
 @tailwind base;
 
+/*noinspection CssInvalidAtRule*/
 @tailwind components;
 
 @tailwind utilities;
