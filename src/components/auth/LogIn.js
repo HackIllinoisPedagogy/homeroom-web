@@ -5,9 +5,9 @@ import Logo from "../Logo";
 import "firebase/auth";
 import "firebase/firestore";
 import {auth} from "../../services/firebase";
-import {Link} from "react-router-dom";
 
-function LogIn() {
+
+function LogIn(props) {
 
     const [errorDiv, setErrorDiv] = useState(<div/>);
     const [email, setEmail] = useState("");
@@ -71,7 +71,7 @@ function LogIn() {
                     className="self-center w-1/3 rounded bg-p-purple hover:bg-purple-700 border-p-purple hover:border-purple-700 mt-3 py-1 px-2 border-4 text-sm text-white hover:shadow-inner"
                     onClick={() => {
                         auth.signInWithEmailAndPassword(email, password).then(() => {
-                            alert("Sign in successful");
+                            props.history.push("/dashboard");
                         }).catch((error) => {
                             setErrorDiv(makeErrorDiv(error.message));
                         })
@@ -81,7 +81,7 @@ function LogIn() {
                 <button
                     className="my-3 self-center w-1/3 rounded bg-p-orange hover:bg-orange-700 border-p-orange hover:border-orange-700 py-1 px-2 border-4 text-sm text-white hover:shadow-inner"
                     onClick={() => {
-                        window.location.pathname = "/signup"
+                        props.history.push("/signup");
                     }}
                 >
                     No account? Sign up!

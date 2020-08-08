@@ -5,9 +5,8 @@ import Logo from "../Logo";
 import "firebase/auth";
 import "firebase/firestore";
 import {auth, db} from "../../services/firebase";
-import {Link} from "react-router-dom";
 
-function SignUp() {
+function SignUp(props) {
 
     const [errorDiv, setErrorDiv] = useState(<div/>);
     const [email, setEmail] = useState("");
@@ -93,7 +92,7 @@ function SignUp() {
                                 }
                             ).then(() => {
                                 auth.signInWithEmailAndPassword(email, password).then(() => {
-                                    alert("Sign up complete!");
+                                    props.history.push("/dashboard");
                                 });
                             })
                         }).catch(error => {
@@ -105,7 +104,7 @@ function SignUp() {
                 <button
                     className="my-3 self-center w-1/3 rounded bg-p-purple hover:bg-purple-700 border-p-purple hover:border-purple-  700 py-1 px-2 border-4 text-sm text-white hover:shadow-inner"
                     onClick={() => {
-                        window.location.pathname = "/"
+                        props.history.push("/");
                     }}
                 >
                     Have an Account? Log In!
