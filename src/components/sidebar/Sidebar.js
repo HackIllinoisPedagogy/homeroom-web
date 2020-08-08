@@ -3,6 +3,7 @@ import {slide as Menu} from 'react-burger-menu';
 import {getConversations, getAssignments} from '../messagingData';
 import {auth, db} from '../../services/firebase';
 import * as firebase from "firebase";
+import ClassSelector from "../ClassSelector";
 
 // const assignments = [
 //     { name: 'Problem Set #1' },
@@ -181,7 +182,7 @@ class Sidebar extends Component {
                                     onClick={() => {
                                         db.collection("classes").doc(this.state.className).get().then(doc => {
                                             if (doc.exists) {
-                                                if(!doc.data().members.includes(this.props.user.uid)) {
+                                                if (!doc.data().members.includes(this.props.user.uid)) {
                                                     db.collection("classes").doc(this.state.className).update({
                                                         members: firebase.firestore.FieldValue.arrayUnion(this.props.user.uid),
                                                     }).then(() => {
@@ -232,6 +233,18 @@ class Sidebar extends Component {
         }
 
         const {role} = this.state.doc;
+        let classes;
+        if (this.state.doc) {
+            classes = this.state.doc.classes.map(c => {
+                return (
+                    <li>
+                        <ClassSelector name={c.name}/>
+                    </li>
+                )
+            });
+        } else {
+            classes = <div/>;
+        }
 
         return (
             <div
@@ -256,6 +269,7 @@ class Sidebar extends Component {
                                 </span>
                             </a>
                         </li>
+                        {classes}
                     </ul>
                 </div>
             </div>
@@ -264,19 +278,13 @@ class Sidebar extends Component {
 
     renderMainSidebar() {
         const name = this.state.doc ? this.state.doc.name : "";
-        let classes;
-        if (this.state.doc) {
-            classes = this.state.doc.classes.map(c => <div>{c.name}, Code: {c.code}</div>);
-        } else {
-            classes = <div/>;
-        }
+
         return (
             <div style={{width: '300px'}}
                  class="absolute overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
                 <div class="flex max-w-xs p-4 bg-white">
                     <ul class="flex flex-col">
                         <li class="h-20 my-px">
-                            <h1>{classes}</h1>
                             <p>{name}</p>
                         </li>
                         <li class="my-px">

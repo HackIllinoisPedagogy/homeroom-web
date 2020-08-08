@@ -12,7 +12,10 @@ class Dashboard extends Component {
     state = {
         activeChatId: '',
         user: null,
+        currentClass: ''
     }
+
+    setClass = c => this.setState({currentClass: c});
 
     setChat = (id) => {
         this.setState({ activeChatId: id })
@@ -32,7 +35,7 @@ class Dashboard extends Component {
     render() {
         return (
             <div>
-                <Sidebar user={this.state.user} setChat={this.setChat} history={this.props.history} />
+                <Sidebar user={this.state.user} setChat={this.setChat} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
                 <div id="dashboard-inner-container">
                     <Chat activeChatId={this.state.activeChatId} />
                 </div>
