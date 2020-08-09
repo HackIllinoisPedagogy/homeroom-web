@@ -29,7 +29,36 @@ class ProblemSet {
 	}
 
 }
-// individual component.js
+class StudentForm extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {value: ''};
+
+		this.handleChange = this.handleChange.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
+	}
+
+	handleChange(event) {
+		this.setState({value: event.target.value});
+	}
+
+	handleSubmit(event) {
+		alert('Your answer was submitted: ' + this.state.value);
+		event.preventDefault();
+	}
+
+	render() {
+		return (
+			<form onSubmit={this.handleSubmit}>
+				<label>
+					Answer:<br/>
+					<input type="text" value={this.state.value} onChange={this.handleChange} />
+				</label>
+				<input type="submit" value="Submit" />
+			</form>
+		);
+	}
+}
 
 class Assignment extends React.Component {
 	constructor(props) {
@@ -124,13 +153,7 @@ class Assignment extends React.Component {
 							{renderingArray.map((el) => this.handleLatexRendering(el))}
 						</div>
 						<div id="response" className="px-20 py-10">
-							<form>
-								<label>
-									Answer:<br/>
-									<input type="text" name="name" />
-								</label>
-								<input type="submit" value="Submit" />
-							</form>
+							<StudentForm/>
 						</div>
 					</div>
 					<div id="tutor-spacing" className="h-64 float-right w-2/5">
