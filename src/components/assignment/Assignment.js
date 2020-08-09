@@ -5,7 +5,7 @@ import {getProblemsById} from "../messagingData.js"
 
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
-
+import autosize from "autosize/dist/autosize";
 
 class ProblemSet {
 	constructor() {
@@ -32,10 +32,16 @@ class ProblemSet {
 class StudentForm extends React.Component {
 	constructor(props) {
 		super(props);
-		this.state = {value: ''};
+		this.state = {
+			value: 'Type in your answer here...'
+		};
 
 		this.handleChange = this.handleChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
+	}
+	componentDidMount() {
+		this.textarea.focus();
+		autosize(this.textarea);
 	}
 
 	handleChange(event) {
@@ -50,11 +56,11 @@ class StudentForm extends React.Component {
 	render() {
 		return (
 			<form onSubmit={this.handleSubmit}>
-				<label>
-					Answer:<br/>
-					<input type="text" value={this.state.value} onChange={this.handleChange} />
-				</label>
-				<input type="submit" value="Submit" />
+				<label className="font-bold">Answer:<br/></label>
+				<textarea className="bg-transparent max-h-75 min-h-38 w-full"
+						  ref={c => (this.textarea = c)} placeholder={this.state.value} rows={2} defaultValue=""
+						  onChange={this.handleChange} />
+				<br/><input className="bg-custom-purple text-gray-100 w-1/5 shadow-md text-center h-8 justify-end" type="submit" value="Submit" />
 			</form>
 		);
 	}
@@ -146,17 +152,28 @@ class Assignment extends React.Component {
 					<div id="pset-title" className="px-16 py-20 w-3/5 float-left">
 						<h3 className="text-black font-bold text-4xl"> {prob.title} </h3>
 						<p className="text-gray-700 py-6 border border-gray-400 border-t-0 border-r-0 border-l-0 border-b-1"> {prob.description} </p>
-						<div id="dropdown" className="py-6">
-							<select name="probs" id="probs" onChange={(event) => this.changeProblem(event.target.value)}>
-								<option value="0">1.</option>
-								<option value="1">2.</option>
-								<option value="2">3.</option>
+						<div id="dropdown" className="py-6 inline-block relative w-15">
+							<select name="probs" id="probs"
+									className="block appearance-none w-full bg-white text-custom-purple font-bold border
+									border-custom-purple px-4 py-2 pr-8 rounded"
+									onChange={(event) => this.changeProblem(event.target.value)}>
+								<option value="0">1</option>
+								<option value="1">2</option>
+								<option value="2">3</option>
 							</select>
+							<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2
+							text-custom-purple">
+								<svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+									 viewBox="0 0 20 20">
+									<path
+										d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+								</svg>
+							</div>
 						</div>
-						<div id="problem" className="px-20 py-6">
+						<div id="problem" className="px-16">
 							{renderingArray.map((el) => this.handleLatexRendering(el))}
 						</div>
-						<div id="response" className="px-20 py-10">
+						<div id="response" className="px-16 py-10">
 							<StudentForm/>
 						</div>
 					</div>

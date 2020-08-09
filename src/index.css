@@ -147,3 +147,11 @@ Note: Beware of modifying this element as it can break the animations - you shou
 .bg-custom-purple {
   background-color: #7754F8;
 }
+
+.border-custom-purple {
+  border-color: #7754F8;
+}
+
+.text-custom-purple {
+  color: #7754F8;
+}

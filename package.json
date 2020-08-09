@@ -7,6 +7,7 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "autoprefixer": "^9.8.6",
+    "autosize": "^4.0.2",
     "axios": "^0.19.2",
     "firebase": "^7.17.2",
     "postcss": "^7.0.32",
