@@ -1,5 +1,9 @@
 import React from 'react';
 import "../../tailwind.css"
+import 'katex/dist/katex.min.css';
+import { InlineMath } from 'react-katex';
+
+import { handleLatexRendering, generateRenderingArray} from './renderingUtils.js'
 
 
 class Tutor extends React.Component {
@@ -25,9 +29,11 @@ class Tutor extends React.Component {
 				(result) => {
 					console.log(result.hint);
 
+					let renderingArray = generateRenderingArray(result.hint);
+
 					let h = (
-						<div id="hint-box" className="w-full bg-white h-auto shadow-md rounded mt-5 p-5">
-							{result.hint}
+						<div id="hint-box" className="w-full bg-white h-auto shadow-md rounded mt-5 p-5 w-1/5">
+							{renderingArray.map((el) => handleLatexRendering(el))}
 						</div>
 					);
 

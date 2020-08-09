@@ -4,7 +4,9 @@ import Tutor from './Tutor.js';
 import {getProblemsById} from "../messagingData.js"
 
 import 'katex/dist/katex.min.css';
-import { InlineMath, BlockMath } from 'react-katex';
+import { InlineMath } from 'react-katex';
+
+import { handleLatexRendering, generateRenderingArray} from './renderingUtils.js'
 
 
 class ProblemSet {
@@ -91,7 +93,7 @@ class Assignment extends React.Component {
 			return text;
 		}
 
-		if (str[0] == "$") {
+		if (str[0] === "$") {
 			let temp = text;
 			text = latex;
 			latex = temp;
@@ -99,7 +101,7 @@ class Assignment extends React.Component {
 
 		let count = 0;
 		while (true) {
-			if (count % 2 == 0) {
+			if (count % 2 === 0) {
 				if (count/2 > text.length - 1) {
 					break;
 				}
@@ -136,8 +138,7 @@ class Assignment extends React.Component {
 			return (<div></div>);
 		}
 
-		let renderingArray = this.generateRenderingArray(prob.problems[this.state.curr_problem].problem);
-		console.log(renderingArray);
+		let renderingArray = generateRenderingArray(prob.problems[this.state.curr_problem].problem);
 
 		return (
 			<div id="page">
@@ -154,7 +155,7 @@ class Assignment extends React.Component {
 							</select>
 						</div>
 						<div id="problem" className="px-20 py-6">
-							{renderingArray.map((el) => this.handleLatexRendering(el))}
+							{renderingArray.map((el) => handleLatexRendering(el))}
 						</div>
 						<div id="response" className="px-20 py-10">
 							<StudentForm/>
