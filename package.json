@@ -17,8 +17,8 @@
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
-    "tailwindcss": "^1.6.2",
-    "typescript": "^3.9.7"
+    "reactjs-dropdown-component": "^1.1.2",
+    "tailwindcss": "^1.6.2"
   },
   "scripts": {
     "build:css": "postcss src/tailwind-settings.css -o src/tailwind.css",
