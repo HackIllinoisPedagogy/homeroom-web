@@ -78,6 +78,15 @@ class Assignment extends React.Component {
 						<div id="problem" className="px-20 py-6 font-mono">
 							{prob.problems[this.state.curr_problem].problem}
 						</div>
+						<div id="response" className="px-20 py-10">
+							<form>
+								<label>
+									Answer:<br/>
+									<input type="text" name="name" />
+								</label>
+								<input type="submit" value="Submit" />
+							</form>
+						</div>
 					</div>
 					<div id="tutor-spacing" className="h-64 float-right w-2/5">
 					</div>
