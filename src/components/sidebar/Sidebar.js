@@ -277,9 +277,15 @@ class Sidebar extends Component {
     }
 
     renderMainSidebar() {
+        if (!this.state.doc) {
+            return (<div>No Docs</div>)
+        }
+
+        const { role } = this.state.doc;
+
         const name = this.state.doc ? this.state.doc.name : "";
-        const classDiv = this.props.currentClass ? <p>Currently looking at {this.props.currentClass.name}</p>: <p/>;
-        const codeDiv = this.props.currentClass ? <p>Currently looking at {this.props.currentClass.code}</p>: <p/>;
+        const classDiv = this.props.currentClass ? <p>Currently looking at {this.props.currentClass.name}</p> : <p />;
+        const codeDiv = this.props.currentClass ? <p>Currently looking at {this.props.currentClass.code}</p> : <p />;
         return (
             <div style={{ width: '300px' }}
                 class="absolute overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
@@ -292,7 +298,7 @@ class Sidebar extends Component {
                         </li>
                         <li class="my-px">
                             <a
-                               class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 bg-gray-100">
+                                class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 bg-gray-100">
                                 <span class="flex items-center justify-center text-lg text-gray-400">
                                     <svg fill="none"
                                         stroke-linecap="round"
@@ -318,13 +324,10 @@ class Sidebar extends Component {
 
                         {
                             Object.values(getAssignments()).map(assignment => {
-                                const{id, name} = assignment;
-                                return(
+                                const { id, name } = assignment;
+                                return (
                                     <li class="my-px" key={id}>
-                                        <a onClick={() => {
-                                            this.props.setAssignment(id);
-                                            this.props.setChat('');   
-                                        }}
+                                        <a onClick={() => this.props.setActive({ name: 'assignment', id })}
                                             class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-gray-100">
                                             <span className="ml-3">{name}</span>
                                         </a>
@@ -332,9 +335,9 @@ class Sidebar extends Component {
                             })
                         }
 
-                        <li class="my-px">
-                            <a 
-                               class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-gray-100">
+                        {role === "teacher" ? <li class="my-px">
+                            <a onClick={() => this.props.setActive({ name: 'create' })}
+                                class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-gray-100">
                                 <span class="flex items-center justify-center text-lg text-green-400">
                                     <svg fill="none"
                                         stroke-linecap="round"
@@ -348,7 +351,7 @@ class Sidebar extends Component {
                                 </span>
                                 <span class="ml-3">Add new</span>
                             </a>
-                        </li>
+                        </li> : <div></div>}
                         <li class="my-px">
                             <span
                                 class="flex font-medium text-sm text-gray-400 px-2 my-4 uppercase">My Conversations</span>
@@ -360,7 +363,7 @@ class Sidebar extends Component {
                                 return (
 
                                     <li class="my-px" key={id}>
-                                        <a onClick={() => this.props.setChat(id)}
+                                        <a onClick={() => this.props.setActive({ name: 'chat', id })}
                                             class="flex flex-row items-center h-12 px-2 rounded-lg text-gray-600 hover:bg-gray-100">
                                             <span class="ml-3">{name}</span>
                                         </a>

@@ -1,39 +1,51 @@
 import React, { Component } from 'react';
-import { slide as Menu } from 'react-burger-menu';
-import Sidebar from './sidebar/Sidebar';
-import Chat from './chat/Chat';
-import {auth, db} from "../services/firebase";
+import { auth, db } from "../services/firebase";
 import Assignment from "./assignment/Assignment";
+import CreateAssignment from './assignment/CreateAssignment';
+import Chat from './chat/Chat';
+import Sidebar from './sidebar/Sidebar';
 
 
 class Dashboard extends Component {
 
     state = {
+        active: {name: 'chat', id: 'conv1'},
         activeChatId: '',
+        createAssignment: false,
         activeAssignemntId: '',
         user: null,
         currentClass: null,
     }
 
-    setClass = c => this.setState({currentClass: c});
+    setClass = c => this.setState({ currentClass: c });
 
     setChat = (id) => {
-        this.setState({ activeChatId: id })
+        this.setState({ activeChatId: id})
     }
+
+    setCreate = () => {
+        this.setState({ createAssignment: true })
+    }
+
+
+    setUser = user => this.setState({ user: user });
 
     setAssignment = (id) => {
         this.setState({activeAssignemntId: id})
     }
 
-    
+    setActive = (active) => {
+        this.setState({ active })
+    }
+
 
     setUser = user => this.setState({user: user});
 
     componentDidMount() {
         auth.onAuthStateChanged(user => {
-            if(user) {
+            if (user) {
                 db.collection("users").doc(user.uid).get().then(doc => {
-                    if(doc.data().classes.length >= 0) {
+                    if (doc.data().classes.length >= 0) {
                         this.setState({
                             user: user,
                             currentClass: doc.data().classes[0],
@@ -52,20 +64,23 @@ class Dashboard extends Component {
     render() {
 
         let display;
-        if(this.state.activeChatId != ''){
-            display = <Chat activeChatId={this.state.activeChatId} />
+        if(this.state.active.name === "chat"){
+            display = <Chat activeChatId={this.state.active.id} />
             
         }
-        else if(this.state.activeAssignmentId != ''){
-            display = <Assignment activeAssignmentId={this.state.activeAssignemntId} />
+        else if(this.state.active.name === "assignment"){
+            display = <Assignment activeAssignmentId={this.state.active.id} />   
+        }
+        else if(this.state.active.name === "create"){
+            display = <CreateAssignment />
             
         }
         // add for All Class once Firebase is in
 
         return (
             <div>
-                <Sidebar user={this.state.user} setChat={this.setChat} setAssignment={this.setAssignment} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
-                <div id="dashboard-inner-container">
+                <Sidebar user={this.state.user} setActive={this.setActive} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
+                <div id="dashboard-inner-container" className="pt-10">
                     {display}
                 </div>
             </div>
