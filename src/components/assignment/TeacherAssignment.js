@@ -27,6 +27,7 @@ function TeacherAssignment() {
 
 
     useEffect(() => {
+        console.log("hook");
         setHeight(window.innerHeight - document.getElementById("assignmentInfo").clientHeight);
     });
 
@@ -86,7 +87,7 @@ function TeacherAssignment() {
                     </span>
                 </div>
             </div>
-            <div className="flex flex-col mx-32 overflow-y-scroll" style={{'height': `${height}px`}}>
+            <div className="flex flex-col mx-32" style={{'height': `${height}px`}}>
                 <SubmissionCard name={"Ashish Rao"} date={"4/20/69"} score={'5/43'} percent={"11%"}/>
                 <SubmissionCard name={"Ashish Rao"} date={"4/20/69"} score={'5/43'} percent={"11%"}/>
                 <SubmissionCard name={"Ashish Rao"} date={"4/20/69"} score={'5/43'} percent={"11%"}/>
