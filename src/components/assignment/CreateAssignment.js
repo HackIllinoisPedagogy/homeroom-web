@@ -84,7 +84,7 @@ class CreateAssignment extends Component {
         this.setProblems([
             {
                 question: '',
-                problem: ''
+                solution: ''
             }
         ])
     }
