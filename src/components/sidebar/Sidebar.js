@@ -283,38 +283,33 @@ class Sidebar extends Component {
 
         const { role } = this.state.doc;
 
-        const name = this.state.doc ? this.state.doc.name : "";
-        const classDiv = this.props.currentClass ? <p>Currently looking at {this.props.currentClass.name}</p> : <p />;
-        const codeDiv = this.props.currentClass ? <p>Currently looking at {this.props.currentClass.code}</p> : <p />;
+        const { currentClass } = this.props;
+
+        if (!currentClass) {
+            return <div>Loading...</div>
+        }
+
         return (
             <div style={{ width: '300px' }}
                 class="fixed  overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
                 <div class="flex max-w-xs p-4 bg-white">
                     <ul class="flex flex-col">
-                        <li class="h-20 my-px">
-                            <p>{name}</p>
-                            {classDiv}
-                            {codeDiv}
-                        </li>
+                        <div class="mb-6">
+                            <li class="h-10 my-px">
+                                <span className="ml-4 text-2xl text-p-dark-blue font-bold"> {this.props.currentClass.name}</span>
+                            </li>
+                            <li class="h-5 my-px">
+                                <span className="ml-4 text-p-medium-gray">{this.state.doc.name}</span>
+                            </li>
+                            {role === 'teacher' ? <li class="h-5  my-px">
+                                <span className="ml-4 text-p-medium-gray">Class Code: {this.props.currentClass.code}</span>
+                            </li> : ''}
+                        </div>
                         <li class="my-px">
-                            <a
-                                class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 bg-gray-100">
-                                <span class="flex items-center justify-center text-lg text-gray-400">
-                                    <svg fill="none"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        class="h-6 w-6">
-                                        <path
-                                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                                    </svg>
-                                </span>
-                                <span class="ml-3">Dashboard</span>
-                                <span
-                                    class="flex items-center justify-center text-sm text-gray-500 font-semibold bg-gray-200 h-6 px-2 rounded-full ml-auto">3</span>
-                            </a>
+                            <div class="flex flex-row items-center h-12 px-4 w-auto rounded-lg text-gray-600 bg-p-light-purple">
+                                <span class="ml-3 text-p-purple">32 Students</span>
+                                
+                            </div>
                         </li>
 
                         <li className="my-px">
@@ -328,7 +323,7 @@ class Sidebar extends Component {
                                 return (
                                     <li class="my-px" key={id}>
                                         <a onClick={() => this.props.setActive({ name: 'assignment', id })}
-                                            class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-gray-100">
+                                            class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
                                             <span className="ml-3">{name}</span>
                                         </a>
                                     </li>);
@@ -337,8 +332,8 @@ class Sidebar extends Component {
 
                         {role === "teacher" ? <li class="my-px">
                             <a onClick={() => this.props.setActive({ name: 'create' })}
-                                class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-gray-100">
-                                <span class="flex items-center justify-center text-lg text-green-400">
+                                class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple">
+                                <span class="flex items-center justify-center text-lg text-p-purple">
                                     <svg fill="none"
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
@@ -349,7 +344,7 @@ class Sidebar extends Component {
                                         <path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </span>
-                                <span class="ml-3">Add new</span>
+                                <span class="ml-3 ">Add new</span>
                             </a>
                         </li> : <div></div>}
                         <li class="my-px">
@@ -364,7 +359,7 @@ class Sidebar extends Component {
 
                                     <li class="my-px" key={id}>
                                         <a onClick={() => this.props.setActive({ name: 'chat', id })}
-                                            class="flex flex-row items-center h-12 px-2 rounded-lg text-gray-600 hover:bg-gray-100">
+                                            class="flex flex-row items-center h-12 px-2 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
                                             <span class="ml-3">{name}</span>
                                         </a>
                                     </li>
@@ -401,7 +396,7 @@ class Sidebar extends Component {
                         </li>
                     </ul>
                 </div>
-            </div>
+            </div >
         );
     }
 
