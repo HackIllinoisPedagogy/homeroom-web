@@ -70,7 +70,7 @@ class Sidebar extends Component {
 
         }
 
-        let placeHolder = this.getAssignments();
+        let placeHolder = await this.getAssignments();
 
         if (!this.state.assignments && this.state.assignments != placeHolder) {
             console.log("placeholder: " + placeHolder)
