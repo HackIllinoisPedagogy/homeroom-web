@@ -19,6 +19,8 @@ import CreateAssignment from './components/assignment/CreateAssignment'
 
 function App() {
 
+  let p = new ProblemSet();
+
   return (
     <Router>
       <Switch>
@@ -27,6 +29,7 @@ function App() {
         </Route>
         <Route path="/dashboard" component={Dashboard}></Route>
         <Route path="/teacherassignment" component={TeacherAssignment}/>
+        <Route path="/assignment" component={Assignment}/>
       </Switch>
     </Router>
   );

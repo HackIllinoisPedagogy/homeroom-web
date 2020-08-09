@@ -32,7 +32,7 @@ class Tutor extends React.Component {
 					let renderingArray = generateRenderingArray(result.hint);
 
 					let h = (
-						<div id="hint-box" className="w-full bg-white h-auto shadow-md rounded mt-5 p-5 w-1/5">
+						<div id="hint-box" className="w-full bg-white h-auto shadow-md rounded mt-5 p-5 w-1/5 overflow-x-auto">
 							{renderingArray.map((el) => handleLatexRendering(el))}
 						</div>
 					);

@@ -77,7 +77,6 @@ class Assignment extends React.Component {
 			curr_problem: 0,
 			problemSet: p,
 			listOpen: false,
-			headerTitle: this.props.title,
 		};
 
 	}
@@ -95,12 +94,13 @@ class Assignment extends React.Component {
 	}
 
 	render() {
+		console.log("here");
 		let prob = this.state.problemSet;
-		const {activeAssignmentId} = this.props;
+		const activeAssignmentId = "2";
 
-		if(!activeAssignmentId){
-			return (<div></div>);
-		}
+		// if(!activeAssignmentId){
+		// 	return (<div></div>);
+		// }
 
 		let renderingArray = generateRenderingArray(prob.problems[this.state.curr_problem].problem);
 
@@ -130,7 +130,7 @@ class Assignment extends React.Component {
 							</div>
 						</div>
 						<div id="problem" className="px-16">
-							{renderingArray.map((el) => this.handleLatexRendering(el))}
+							{renderingArray.map((el) => handleLatexRendering(el))}
 						</div>
 						<div id="response" className="px-16 py-10">
 							<StudentForm/>
