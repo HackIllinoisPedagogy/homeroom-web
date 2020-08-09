@@ -55,6 +55,7 @@ class Sidebar extends Component {
 
     }
 
+
     componentDidUpdate =  async (prevState) => {
         if (this.state.user && !this.state.doc) {
             console.log(this.state.user.uid);
@@ -87,42 +88,29 @@ class Sidebar extends Component {
         this.setState({ addClassModal: true })
     }
 
-    getAssignments = () => {
+    map_func = async (id) => {
+      console.log(id);
+      let assignmentRef = await db.collection("assignments").doc(id).get();
+      return assignmentRef.data();
+    }
 
-        if (!this.props.currentClass) {
+    getAssignments = async () => {
+      let toReturn = [];
+
+      if (!this.props.currentClass) {
             return;
         }
-        console.log("Current Class: " + this.props.currentClass)
 
-        getDocument("classes", this.props.currentClass.code).then(classInfo => {
-            const classAssignmentIds = classInfo.data().assignments;
+      let classRef = await getDocument("classes", this.props.currentClass.code);
 
-            if (classAssignmentIds) {
-                console.log("assignments: " + classAssignmentIds)
+      for (let assignmentId of classRef.data().assignments) {
+        let assignmentRef = await db.collection("assignments").doc(assignmentId).get();
+        console.log(assignmentRef.data().name);
+        toReturn.push(assignmentRef.data());
+      };
 
-                const returnStatement = classAssignmentIds.map(assignmentId => {
-                    console.log("ID: " + assignmentId);
-                    db.collection("assignments").doc(assignmentId).get().then(assignment => {
-                        if (assignment.exists) {
-                            console.log("assigmentHERE: " + assignment.data().name)
-                            console.log({ id: assignmentId, name: assignment.data().name });
-                            return { id: assignmentId, name: assignment.data().name };
-                            
-                        }
-                        else {
-                            return { id: "yee", name: "nee" };
-                        }
-                    });
-
-                })
-                //if(returnStatement === undefined) console.log("ReturnStatment: NULL");
-                console.log("return Statement: " + returnStatement[0]);
-                return returnStatement;
-
-            }
-
-        });
-
+      console.log(toReturn);
+      return toReturn;
     }
 
 
