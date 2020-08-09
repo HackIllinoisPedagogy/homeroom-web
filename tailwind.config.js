@@ -3,8 +3,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'p-purple' : 'rgb(119,84,248)',
-        'p-orange' : 'rgb(223, 80, 110)'
+        'p-purple': 'rgb(119,84,248)',
+        'p-light-purple': '#F0EDFE',
+        'p-orange': 'rgb(223, 80, 110)',
+        'p-medium-gray': '#878787',
+        'p-dark-blue': '#0A1032'
       }
     },
   },
