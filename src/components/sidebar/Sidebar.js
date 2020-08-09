@@ -284,7 +284,8 @@ class Sidebar extends Component {
         const { role } = this.state.doc;
 
         const name = this.state.doc ? this.state.doc.name : "";
-
+        const classDiv = this.props.currentClass ? <p>Currently looking at {this.props.currentClass.name}</p> : <p />;
+        const codeDiv = this.props.currentClass ? <p>Currently looking at {this.props.currentClass.code}</p> : <p />;
         return (
             <div style={{ width: '300px' }}
                 class="absolute overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
@@ -292,11 +293,11 @@ class Sidebar extends Component {
                     <ul class="flex flex-col">
                         <li class="h-20 my-px">
                             <p>{name}</p>
-                            <p>Currently looking at {this.props.currentClass.name}</p>
-                            <p>Class Code: {this.props.currentClass.code}</p>
+                            {classDiv}
+                            {codeDiv}
                         </li>
                         <li class="my-px">
-                            <a href="#"
+                            <a
                                 class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 bg-gray-100">
                                 <span class="flex items-center justify-center text-lg text-gray-400">
                                     <svg fill="none"
@@ -321,18 +322,21 @@ class Sidebar extends Component {
                                 className="flex font-medium text-sm text-gray-400 px-2 my-4 uppercase">My Assignments</span>
                         </li>
 
-                        {getAssignments().map(assignment => {
-                            const { name } = assignment;
-                            return (<li class="my-px" key={name}>
-                                <a href="#"
-                                    class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-gray-100">
-                                    <span class="ml-3">{name}</span>
-                                </a>
-                            </li>);
-                        })}
+                        {
+                            Object.values(getAssignments()).map(assignment => {
+                                const { id, name } = assignment;
+                                return (
+                                    <li class="my-px" key={id}>
+                                        <a onClick={() => this.props.setActive({ name: 'assignment', id })}
+                                            class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-gray-100">
+                                            <span className="ml-3">{name}</span>
+                                        </a>
+                                    </li>);
+                            })
+                        }
 
                         {role === "teacher" ? <li class="my-px">
-                            <a onClick={() => this.props.setCreate()}
+                            <a onClick={() => this.props.setActive({ name: 'create' })}
                                 class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-gray-100">
                                 <span class="flex items-center justify-center text-lg text-green-400">
                                     <svg fill="none"
@@ -359,7 +363,7 @@ class Sidebar extends Component {
                                 return (
 
                                     <li class="my-px" key={id}>
-                                        <a onClick={() => this.props.setChat(id)}
+                                        <a onClick={() => this.props.setActive({ name: 'chat', id })}
                                             class="flex flex-row items-center h-12 px-2 rounded-lg text-gray-600 hover:bg-gray-100">
                                             <span class="ml-3">{name}</span>
                                         </a>

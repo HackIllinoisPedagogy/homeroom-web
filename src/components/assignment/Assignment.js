@@ -1,8 +1,7 @@
 import React from 'react';
 import "../../tailwind.css";
-
 import Tutor from './Tutor.js';
-
+import {getProblemsById} from "../messagingData.js"
 class ProblemSet {
 	constructor() {
 		this.title = "Problem Set 1";
@@ -21,11 +20,14 @@ class ProblemSet {
 class Assignment extends React.Component {
 	constructor(props) {
 		super(props);
+		let p = new ProblemSet();
+
 		this.state = {
 			// problems = props.problems,
 			curr_problem: 0,
-			problemSet: props.problemSet,
+			problemSet: p,
 		};
+
 	}
 
 	changeProblem(i) {
@@ -35,11 +37,22 @@ class Assignment extends React.Component {
 		});
 	}
 
+	getProblems(id){
+		const problemSet = getProblemsById(id);
+		return <div>{problemSet.name}</div>
+	}
+
 	render() {
 		let prob = this.state.problemSet;
+		const {activeAssignmentId} = this.props;
+
+		if(!activeAssignmentId){
+			return (<div></div>);
+		}
 
 		return (
 			<div id="page">
+				<div>{activeAssignmentId}</div>
 				<div id="content" className="">
 					<div id="pset-title" className="px-16 py-20 w-3/5 float-left">
 						<h3 className="text-black font-bold text-4xl"> {prob.title} </h3>
