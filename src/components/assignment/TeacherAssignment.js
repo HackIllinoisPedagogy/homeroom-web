@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import SubmissionCard from "./SubmissionCard";
+import {db, getCollection, getDocument} from "../../services/firebase";
 
 function TeacherAssignment() {
     const [height, setHeight] = useState(0);
@@ -12,7 +13,7 @@ function TeacherAssignment() {
         <span className="text-gray-400" onClick={() => setCompleted(false)}>
             Not Completed
         </span>;
-    if(completed) {
+    if (completed) {
         completedDiv =
             <span className="border-b border-p-purple" onClick={() => setCompleted(true)}>
                 Completed
@@ -23,7 +24,6 @@ function TeacherAssignment() {
                 Not Completed
             </span>;
     }
-
 
 
     useEffect(() => {
