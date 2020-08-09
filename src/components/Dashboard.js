@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { auth, db } from "../services/firebase";
+import {auth, db, getDocument} from "../services/firebase";
 import Assignment from "./assignment/Assignment";
 import CreateAssignment from './assignment/CreateAssignment';
 import Chat from './chat/Chat';
@@ -12,7 +12,7 @@ class Dashboard extends Component {
         active: {name: 'chat', id: 'conv1'},
         activeChatId: '',
         createAssignment: false,
-        activeAssignemntId: '',
+        activeAssigmentId: '',
         user: null,
         currentClass: null,
     }
@@ -56,7 +56,7 @@ class Dashboard extends Component {
             display = <Assignment activeAssignmentId={this.state.active.id} />   
         }
         else if(this.state.active.name === "create"){
-            display = <CreateAssignment />
+            display = <CreateAssignment currentClass={this.state.currentClass}/>
             
         }
         // add for All Class once Firebase is in

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { slide as Menu } from 'react-burger-menu';
 import { getConversations, getAssignments } from '../messagingData';
-import { auth, db } from '../../services/firebase';
+import { auth, db, getDocument } from '../../services/firebase';
 import * as firebase from "firebase";
 import ClassSelector from "../ClassSelector";
 
@@ -26,13 +26,19 @@ class Sidebar extends Component {
         createClassModal: false,
         addClassModal: false,
         className: "",
+        assignments: null,
+
     };
+
+    setAssignments(assignments) {
+        this.setState({ assignments })
+    }
 
     setClassName(name) {
         this.setState({ className: name });
     }
 
-    componentDidMount() {
+    async componentDidMount() {
 
         const setUser = (user) => {
             console.log(user);
@@ -46,9 +52,10 @@ class Sidebar extends Component {
                 console.log("no user");
             }
         });
+
     }
 
-    componentDidUpdate = async () => {
+    componentDidUpdate =  async (prevState) => {
         if (this.state.user && !this.state.doc) {
             console.log(this.state.user.uid);
             const userRef = db.collection('users').doc(this.state.user.uid);
@@ -62,6 +69,14 @@ class Sidebar extends Component {
 
         }
 
+        let placeHolder = this.getAssignments();
+
+        if (!this.state.assignments && this.state.assignments != placeHolder) {
+            console.log("placeholder: " + placeHolder)
+            this.setAssignments(placeHolder);
+        }
+
+
     }
 
     createClass = () => {
@@ -71,6 +86,47 @@ class Sidebar extends Component {
     addClass = () => {
         this.setState({ addClassModal: true })
     }
+
+    getAssignments = () => {
+
+        if (!this.props.currentClass) {
+            return;
+        }
+        console.log("Current Class: " + this.props.currentClass)
+
+        getDocument("classes", this.props.currentClass.code).then(classInfo => {
+            const classAssignmentIds = classInfo.data().assignments;
+
+            if (classAssignmentIds) {
+                console.log("assignments: " + classAssignmentIds)
+
+                const returnStatement = classAssignmentIds.map(assignmentId => {
+                    console.log("ID: " + assignmentId);
+                    db.collection("assignments").doc(assignmentId).get().then(assignment => {
+                        if (assignment.exists) {
+                            console.log("assigmentHERE: " + assignment.data().name)
+                            console.log({ id: assignmentId, name: assignment.data().name });
+                            return { id: assignmentId, name: assignment.data().name };
+                            
+                        }
+                        else {
+                            return { id: "yee", name: "nee" };
+                        }
+                    });
+
+                })
+                //if(returnStatement === undefined) console.log("ReturnStatment: NULL");
+                console.log("return Statement: " + returnStatement[0]);
+                return returnStatement;
+
+            }
+
+        });
+
+    }
+
+
+
 
     renderCreateClassModal() {
         return (
@@ -289,6 +345,27 @@ class Sidebar extends Component {
             return <div>Loading...</div>
         }
 
+        let assignmentList = <div></div>
+
+        if (this.state.assignments && this.state.assignments.length) {
+            console.log("State of assignments: " + this.state.assignments);
+
+            assignmentList =
+
+                this.state.assignments.map(assignment => {
+                    console.log("ASSIGNMENt: " + assignment)
+                    const { id, name } = assignment;
+                    return (
+                        <li class="my-px" key={id}>
+                            <a onClick={() => this.props.setActive({ name: 'assignment', id })}
+                                class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
+                                <span className="ml-3">{name}</span>
+                            </a>
+                        </li>);
+                })
+        }
+
+
         return (
             <div style={{ width: '300px' }}
                 class="fixed  overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
@@ -308,7 +385,7 @@ class Sidebar extends Component {
                         <li class="my-px">
                             <div class="flex flex-row items-center h-12 px-4 w-auto rounded-lg text-gray-600 bg-p-light-purple">
                                 <span class="ml-3 text-p-purple">32 Students</span>
-                                
+
                             </div>
                         </li>
 
@@ -317,18 +394,7 @@ class Sidebar extends Component {
                                 className="flex font-medium text-sm text-gray-400 px-2 my-4 uppercase">My Assignments</span>
                         </li>
 
-                        {
-                            Object.values(getAssignments()).map(assignment => {
-                                const { id, name } = assignment;
-                                return (
-                                    <li class="my-px" key={id}>
-                                        <a onClick={() => this.props.setActive({ name: 'assignment', id })}
-                                            class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
-                                            <span className="ml-3">{name}</span>
-                                        </a>
-                                    </li>);
-                            })
-                        }
+                        {assignmentList}
 
                         {role === "teacher" ? <li class="my-px">
                             <a onClick={() => this.props.setActive({ name: 'create' })}
