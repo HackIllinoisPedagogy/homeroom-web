@@ -37,8 +37,9 @@ class Chat extends Component {
 
     render() {
         const { activeChatId } = this.props;
-
-        if (!activeChatId) {
+        console.log(activeChatId);
+        if (activeChatId) {
+            
             return <div>Chat Page</div>;
         }
 

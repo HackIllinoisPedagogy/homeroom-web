@@ -27,11 +27,16 @@ class Sidebar extends Component {
         addClassModal: false,
         className: "",
         assignments: null,
+        chats: null
 
     };
 
     setAssignments(assignments) {
-        this.setState({ assignments })
+        this.setState({ assignments });
+    }
+
+    setChats(chats){
+        this.setState({ chats });
     }
 
     setClassName(name) {
@@ -41,7 +46,6 @@ class Sidebar extends Component {
     async componentDidMount() {
 
         const setUser = (user) => {
-            console.log(user);
             this.setState({ user });
         }
 
@@ -56,9 +60,8 @@ class Sidebar extends Component {
     }
 
 
-    componentDidUpdate =  async (prevState) => {
+    componentDidUpdate = async (prevState) => {
         if (this.state.user && !this.state.doc) {
-            console.log(this.state.user.uid);
             const userRef = db.collection('users').doc(this.state.user.uid);
             const doc = await userRef.get();
 
@@ -70,12 +73,18 @@ class Sidebar extends Component {
 
         }
 
-        let placeHolder = await this.getAssignments();
+        let assignmentVariable = await this.getAssignments();
+        let chatVariable = await this.getChats()
 
-        if (!this.state.assignments && this.state.assignments != placeHolder) {
-            console.log("placeholder: " + placeHolder)
-            this.setAssignments(placeHolder);
+        if (!this.state.assignments && this.state.assignments != assignmentVariable) {
+            this.setAssignments(assignmentVariable);
         }
+
+        if (!this.state.chats && this.state.chats != chatVariable) {
+            this.setChats(chatVariable);
+        }
+
+        
 
 
     }
@@ -89,28 +98,42 @@ class Sidebar extends Component {
     }
 
     map_func = async (id) => {
-      console.log(id);
-      let assignmentRef = await db.collection("assignments").doc(id).get();
-      return assignmentRef.data();
+        let assignmentRef = await db.collection("assignments").doc(id).get();
+        return assignmentRef.data();
     }
 
     getAssignments = async () => {
-      let toReturn = [];
+        let toReturn = [];
 
-      if (!this.props.currentClass) {
+        if (!this.props.currentClass) {
             return;
         }
 
-      let classRef = await getDocument("classes", this.props.currentClass.code);
+        let classRef = await getDocument("classes", this.props.currentClass.code);
 
-      for (let assignmentId of classRef.data().assignments) {
-        let assignmentRef = await db.collection("assignments").doc(assignmentId).get();
-        console.log(assignmentRef.data().name);
-        toReturn.push(assignmentRef.data());
-      };
+        for (let assignmentId of classRef.data().assignments) {
+            let assignmentRef = await db.collection("assignments").doc(assignmentId).get();
+            toReturn.push( {...assignmentRef.data(), id: assignmentId});
+        };
 
-      console.log(toReturn);
-      return toReturn;
+        return toReturn;
+    }
+
+    getChats = async () => {
+        let toReturn = [];
+
+        if (!this.props.currentClass) {
+            return;
+        }
+
+        let classRef = await getDocument("classes", this.props.currentClass.code);
+
+        for (let chatId of classRef.data().chats) {
+            let chatRef = await db.collection("chats").doc(chatId).get();
+            toReturn.push({...chatRef.data(), id: chatId});
+        };
+
+        return toReturn;
     }
 
 
@@ -333,15 +356,11 @@ class Sidebar extends Component {
             return <div>Loading...</div>
         }
 
-        let assignmentList = <div></div>
+        let assignmentList = <div></div>;
+        let chatList = <div></div>;
 
         if (this.state.assignments && this.state.assignments.length) {
-            console.log("State of assignments: " + this.state.assignments);
-
-            assignmentList =
-
-                this.state.assignments.map(assignment => {
-                    console.log("ASSIGNMENt: " + assignment)
+            assignmentList = this.state.assignments.map(assignment => {
                     const { id, name } = assignment;
                     return (
                         <li class="my-px" key={id}>
@@ -352,6 +371,22 @@ class Sidebar extends Component {
                         </li>);
                 })
         }
+
+        if (this.state.chats && this.state.chats.length) {
+            chatList = this.state.chats.map(chat => {
+                    const { id, name } = chat;
+                    console.log(chat);
+                    return (
+                        <li class="my-px" key={id}>
+                            <a onClick={() => this.props.setActive({ name: 'chat', id })}
+                                class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
+                                <span className="ml-3">{name}</span>
+                            </a>
+                        </li>);
+                })
+        }
+
+
 
 
         return (
@@ -406,28 +441,11 @@ class Sidebar extends Component {
                                 class="flex font-medium text-sm text-gray-400 px-2 my-4 uppercase">My Conversations</span>
                         </li>
 
-                        {
-                            Object.values(getConversations()).map(conversation => {
-                                const { name, id } = conversation;
-                                return (
-
-                                    <li class="my-px" key={id}>
-                                        <a onClick={() => this.props.setActive({ name: 'chat', id })}
-                                            class="flex flex-row items-center h-12 px-2 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
-                                            <span class="ml-3">{name}</span>
-                                        </a>
-                                    </li>
-                                );
-
-                            })
-
-                        }
+                        {chatList}
 
                         <li class="my-px">
                             <a onClick={() => {
-                                console.log("hell1");
                                 auth.signOut().then(() => {
-                                    console.log("hello");
                                     this.props.history.push("/");
                                 })
                             }}

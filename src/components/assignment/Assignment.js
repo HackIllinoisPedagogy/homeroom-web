@@ -130,7 +130,7 @@ class Assignment extends React.Component {
 							</div>
 						</div>
 						<div id="problem" className="px-16">
-							{renderingArray.map((el) => this.handleLatexRendering(el))}
+							{renderingArray.map((el) => handleLatexRendering(el))}
 						</div>
 						<div id="response" className="px-16 py-10">
 							<StudentForm/>

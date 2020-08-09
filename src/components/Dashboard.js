@@ -20,6 +20,7 @@ class Dashboard extends Component {
     setClass = c => this.setState({ currentClass: c });
 
     setActive = (active) => {
+        console.log(active);
         this.setState({ active })
     }
 
