@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { slide as Menu } from 'react-burger-menu';
 import Sidebar from './sidebar/Sidebar';
+import CreateAssignment from './assignment/CreateAssignment'
 import Chat from './chat/Chat';
-import {auth, db} from "../services/firebase";
+import { auth, db } from "../services/firebase";
 
 
 
@@ -10,23 +11,30 @@ import {auth, db} from "../services/firebase";
 class Dashboard extends Component {
 
     state = {
-        activeChatId: '',
+        activeChatId: null,
+        createChat: false,
         user: null,
         currentClass: 0
     }
 
-    setClass = c => this.setState({currentClass: c});
+    setClass = c => this.setState({ currentClass: c });
 
     setChat = (id) => {
-        this.setState({ activeChatId: id })
+        this.setState({ activeChatId: id, createChat: null })
     }
 
-    setUser = user => this.setState({user: user});
+    setCreate = () => {
+        this.setState({ activeChatId: null, createChat: true })
+    }
+
+
+
+    setUser = user => this.setState({ user: user });
     componentDidMount() {
         auth.onAuthStateChanged(user => {
-            if(user) {
+            if (user) {
                 db.collection("users").doc(user.uid).get().then(doc => {
-                    if(doc.data().classes.length >= 0) {
+                    if (doc.data().classes.length >= 0) {
                         this.setState({
                             user: user,
                             currentClass: doc.data().classes[0],
@@ -45,9 +53,10 @@ class Dashboard extends Component {
     render() {
         return (
             <div>
-                <Sidebar user={this.state.user} setChat={this.setChat} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
-                <div id="dashboard-inner-container">
-                    <Chat activeChatId={this.state.activeChatId} />
+                <Sidebar user={this.state.user} setCreate={this.setCreate} setChat={this.setChat} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass} />
+                <div id="dashboard-inner-container" className="pt-10">
+                    {this.state.activeChatId ? <Chat activeChatId={this.state.activeChatId} /> : ''}
+                    {this.state.createChat ? <CreateAssignment  user={this.state.user} /> : ''}
                 </div>
             </div>
 

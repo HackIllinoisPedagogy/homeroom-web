@@ -10,7 +10,9 @@ import {
 import LogIn from './components/auth/LogIn';
 import Dashboard from './components/Dashboard';
 import SignUp from "./components/auth/SignUp";
-import Assignment, { ProblemSet } from './components/assignment/Assignment'
+import Assignment, { ProblemSet } from './components/assignment/Assignment';
+import CreateAssignment from './components/assignment/CreateAssignment'
+
 
 
 function App() {
@@ -25,6 +27,7 @@ function App() {
         </Route>
         <Route path="/dashboard" component={Dashboard}></Route>
         <Route path="/assignment" render={() => <Assignment problemSet={p}/>}></Route>
+        <Route path="/dashboard/create" component={CreateAssignment}></Route>
       </Switch>
     </Router>
   );

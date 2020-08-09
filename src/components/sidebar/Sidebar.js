@@ -277,6 +277,12 @@ class Sidebar extends Component {
     }
 
     renderMainSidebar() {
+        if (!this.state.doc) {
+            return (<div>No Docs</div>)
+        }
+
+        const { role } = this.state.doc;
+
         const name = this.state.doc ? this.state.doc.name : "";
 
         return (
@@ -325,8 +331,8 @@ class Sidebar extends Component {
                             </li>);
                         })}
 
-                        <li class="my-px">
-                            <a href="#"
+                        {role === "teacher" ? <li class="my-px">
+                            <a onClick={() => this.props.setCreate()}
                                 class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-gray-100">
                                 <span class="flex items-center justify-center text-lg text-green-400">
                                     <svg fill="none"
@@ -341,7 +347,7 @@ class Sidebar extends Component {
                                 </span>
                                 <span class="ml-3">Add new</span>
                             </a>
-                        </li>
+                        </li> : <div></div>}
                         <li class="my-px">
                             <span
                                 class="flex font-medium text-sm text-gray-400 px-2 my-4 uppercase">My Conversations</span>
