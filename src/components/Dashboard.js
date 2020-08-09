@@ -19,25 +19,9 @@ class Dashboard extends Component {
 
     setClass = c => this.setState({ currentClass: c });
 
-    setChat = (id) => {
-        this.setState({ activeChatId: id})
-    }
-
-    setCreate = () => {
-        this.setState({ createAssignment: true })
-    }
-
-
-    setUser = user => this.setState({ user: user });
-
-    setAssignment = (id) => {
-        this.setState({activeAssignemntId: id})
-    }
-
     setActive = (active) => {
         this.setState({ active })
     }
-
 
     setUser = user => this.setState({user: user});
 
@@ -78,7 +62,7 @@ class Dashboard extends Component {
         // add for All Class once Firebase is in
 
         return (
-            <div>
+            <div class="overflow-y-auto">
                 <Sidebar user={this.state.user} setActive={this.setActive} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
                 <div id="dashboard-inner-container" className="pt-10">
                     {display}

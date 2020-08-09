@@ -248,7 +248,7 @@ class Sidebar extends Component {
 
         return (
             <div
-                class="absolute z-20 overflow-hidden bg-white mb-4 border-red-light w-full h-screen md:w-24 border-solid border-2 border-gray-200">
+                class="fixed z-20 overflow-hidden bg-white mb-4 border-red-light w-full h-screen md:w-24 border-solid border-2 border-gray-200">
                 <div class="flex w-full max-w-xs p-4 bg-white">
                     <ul class="flex flex-col w-full">
                         <li class="my-px">
@@ -288,7 +288,7 @@ class Sidebar extends Component {
         const codeDiv = this.props.currentClass ? <p>Currently looking at {this.props.currentClass.code}</p> : <p />;
         return (
             <div style={{ width: '300px' }}
-                class="absolute overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
+                class="fixed  overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
                 <div class="flex max-w-xs p-4 bg-white">
                     <ul class="flex flex-col">
                         <li class="h-20 my-px">
