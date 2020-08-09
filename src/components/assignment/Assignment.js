@@ -87,6 +87,10 @@ class Assignment extends React.Component {
 		let latex = str.match(/[$].*?[$]/g);
 		let text = str.split(/[$].*?[$]/g);
 
+		if (latex == null) {
+			return text;
+		}
+
 		if (str[0] == "$") {
 			let temp = text;
 			text = latex;
