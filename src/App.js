@@ -10,12 +10,14 @@ import {
 import LogIn from './components/auth/LogIn';
 import Dashboard from './components/Dashboard';
 import SignUp from "./components/auth/SignUp";
+
 import Assignment, { ProblemSet } from './components/assignment/Assignment'
+import TeacherAssignment from "./components/assignment/TeacherAssignment";
+import CreateAssignment from './components/assignment/CreateAssignment'
+
 
 
 function App() {
-
-  let p = new ProblemSet();
 
   return (
     <Router>
@@ -24,7 +26,7 @@ function App() {
         <Route path="/signup" component={SignUp}>
         </Route>
         <Route path="/dashboard" component={Dashboard}></Route>
-        <Route path="/assignment" render={() => <Assignment problemSet={p}/>}></Route>
+        <Route path="/teacherassignment" component={TeacherAssignment}/>
       </Switch>
     </Router>
   );

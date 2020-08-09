@@ -32,7 +32,7 @@ class Assignment extends React.Component {
 		this.state = {
 			// problems = props.problems,
 			curr_problem: 0,
-			problemSet: props.problemSet,
+			problemSet: p,
 			listOpen: false,
 			headerTitle: this.props.title,
 		};
@@ -44,10 +44,12 @@ class Assignment extends React.Component {
 			curr_problem: i,
 		});
 	}
-// on the click, few things need to happen
-	//1 set currProblem to that index
-	//1.5 save that index so that you can refer to it later
-	//2 this should in turn display that problem
+
+	getProblems(id){
+		const problemSet = getProblemsById(id);
+		return <div>{problemSet.name}</div>
+	}
+
 	render() {
 		let prob = this.state.problemSet;
 		return (
@@ -81,4 +83,4 @@ class Assignment extends React.Component {
 export default Assignment;
 export {
 	ProblemSet
-};
+};};
