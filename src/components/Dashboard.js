@@ -15,7 +15,10 @@ class Dashboard extends Component {
         activeAssigmentId: '',
         user: null,
         currentClass: null,
+        numStudents: 0,
     }
+
+    setNumStudents = n => this.setState({numStudents: n})
 
     setClass = c => this.setState({ currentClass: c });
 
@@ -35,6 +38,8 @@ class Dashboard extends Component {
                         code: userDoc.data().classes[0].code,
                         name: userDoc.data().classes[0].name,
                     })
+                    const temp_classRef = await getDocument("classes", userDoc.data().classes[0].code);
+                    this.setNumStudents(temp_classRef.data().members.length - 1);
                 } else {
                     this.props.history.push("/landing");
                 }
@@ -43,6 +48,12 @@ class Dashboard extends Component {
                 this.props.history.push('/');
             }
         })
+    }
+    async componentDidUpdate(prevProps, prevState, snapshot) {
+        if(prevState.currentClass && prevState.currentClass.code !== this.state.currentClass.code) {
+            const classRef = await getDocument("classes", this.state.currentClass.code + "");
+            this.setNumStudents(classRef.data().members.length - 1);
+        }
     }
 
     render() {
@@ -63,7 +74,7 @@ class Dashboard extends Component {
 
         return (
             <div class="overflow-y-auto">
-                <Sidebar user={this.state.user} setActive={this.setActive} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
+                <Sidebar user={this.state.user} numStudents={this.state.numStudents} setActive={this.setActive} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
                 <div id="dashboard-inner-container">
                     {display}
                 </div>

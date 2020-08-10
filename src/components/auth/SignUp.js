@@ -56,9 +56,9 @@ function SignUp(props) {
     }
 
     return (
-        <form style={{
+        <div style={{
             'height': window.innerHeight + "px",
-        }} onSubmit={signUp} onKeyDown={(e) => {
+        }} onKeyDown={(e) => {
             if(e.keyCode === 13) signUp();
         }}>
             <div className="flex w-full justify-center flex p-3"
@@ -102,7 +102,10 @@ function SignUp(props) {
                 </form>
                 <button
                     className="self-center w-1/3 rounded bg-p-orange hover:bg-orange-700 border-p-orange hover:border-orange-700 mt-3 py-1 px-2 border-4 text-sm text-white hover:shadow-inner"
-                    type="submit">
+                    onClick={() => {
+                        signUp();
+                    }}
+                >
                     Sign Up!
                 </button>
                 <button
@@ -115,7 +118,7 @@ function SignUp(props) {
                 </button>
                 {errorDiv}
             </div>
-        </form>
+        </div>
     );
 }
 
