@@ -6,7 +6,10 @@ import {getProblemsById} from "../messagingData.js"
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import { handleLatexRendering, generateRenderingArray} from './renderingUtils.js'
+import { addStyles, EditableMathField } from 'react-mathquill'
 import autosize from "autosize/dist/autosize";
+
+addStyles()
 
 class ProblemSet {
 	constructor() {
@@ -30,6 +33,30 @@ class ProblemSet {
 	}
 
 }
+
+class LatexField extends React.Component {
+	constructor(props) {
+		super(props)
+
+		this.state = {
+			latex: '',
+		}
+	}
+
+	render() {
+		return (
+			<EditableMathField
+				placeholder="Type in your answer here..."
+				latex={this.state.latex} // latex value for the input field
+				onChange={(mathField) => {
+					// called everytime the input changes
+					this.setState({ latex: mathField.latex() })
+				}}
+			/>
+		)
+	}
+}
+
 class StudentForm extends React.Component {
 	constructor(props) {
 		super(props);
@@ -135,6 +162,7 @@ class Assignment extends React.Component {
 						<div id="response" className="px-16 py-10">
 							<StudentForm/>
 						</div>
+						<div><LatexField/></div>
 					</div>
 					<div id="tutor-spacing" className="h-64 float-right w-2/5">
 					</div>
