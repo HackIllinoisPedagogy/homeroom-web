@@ -9,7 +9,7 @@ import Sidebar from './sidebar/Sidebar';
 class Dashboard extends Component {
 
     state = {
-        active: {name: 'chat', id: 'conv1'},
+        active: '',
         activeChatId: '',
         createAssignment: false,
         activeAssigmentId: '',
@@ -50,14 +50,14 @@ class Dashboard extends Component {
 
         let display;
         if(this.state.active.name === "chat"){
-            display = <Chat activeChatId={this.state.active.id} />
+            display = <Chat user={this.state.user} activeChatId={this.state.active.id} />
             
         }
         else if(this.state.active.name === "assignment"){
-            display = <Assignment activeAssignmentId={this.state.active.id} />   
+            display = <Assignment user={this.state.user} activeAssignmentId={this.state.active.id} />   
         }
         else if(this.state.active.name === "create"){
-            display = <CreateAssignment currentClass={this.state.currentClass}/>
+            display = <CreateAssignment user={this.state.user} currentClass={this.state.currentClass}/>
             
         }
         // add for All Class once Firebase is in
@@ -65,7 +65,7 @@ class Dashboard extends Component {
         return (
             <div class="overflow-y-auto">
                 <Sidebar user={this.state.user} setActive={this.setActive} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
-                <div id="dashboard-inner-container" className="pt-10">
+                <div id="dashboard-inner-container">
                     {display}
                 </div>
             </div>
