@@ -69,7 +69,7 @@ class Chat extends Component {
 
     async componentDidMount() {
         this.scrollToBottom();
-        this.getCurrentUser();
+        await this.getCurrentUser();
         const { activeChatId } = this.props;
         const messagesSnapshot = await db.collection("chats")
             .doc(activeChatId)
@@ -89,9 +89,9 @@ class Chat extends Component {
                 }
             });
 
-        this.getConversationsById(activeChatId);
+        await this.getConversationsById(activeChatId);
         if (this.state.chatInfo) {
-            this.getMembers();
+            await this.getMembers();
         }
 
     }
@@ -108,14 +108,13 @@ class Chat extends Component {
     getMembers = async () => {
         const { activeChatId } = this.props;
         let members = [];
-        this.state.chatInfo.members.forEach(async memberId => {
-            const member = await getDocument('users', memberId);
-            if (member.exists) {
-                members.push(member.data())
-
-            }
-        });
-        console.log(members);
+        for(let i = 0; i < this.state.chatInfo.members.length; i++) {
+            const userRef = (await getDocument("users", this.state.chatInfo.members[i])).data();
+            members.push({
+                name: userRef.name,
+                role: userRef.role
+            });
+        }
         this.setState({ members });
     }
 
@@ -229,13 +228,13 @@ class Chat extends Component {
                         </div>
                     </form>
                 </div>
-                <div class="w-2/6 flex flex-col justify-center h-screen items-center">
-                    <p class="px-2 text-p-dark-blue font-bold mb-2 text-2xl text-left font-thin px-4 pt-3">Members</p>
-                    <div className="w-10/12 justify-center shadow rounded-lg h-64 flex flex-col bg-white p-3 overflow-y-auto">
+                <div className="w-2/6 flex flex-col justify-center h-screen items-center">
+                    <p className="px-2 text-p-dark-blue font-bold mb-2 text-2xl text-left font-thin px-4 pt-3">Members</p>
+                    <div className="w-10/12 justify-center shadow rounded-lg flex flex-col bg-white p-3 h-64 overflow-y-auto">
 
-                        <div class="py-5 px-3">
+                        <div className="my-5 px-3" style={{'height' : '100%'}}>
                             {this.state.members ? this.state.members.map(member => {
-                                console.log("here");
+                                console.log(member.name);
                                 return <div class="flex justify-between px-2 py-2">
                                     <p class="flex text-gray-700">
                                         <svg class="w-2 text-gray-500 mx-2" viewBox="0 0 8 8" fill="currentColor">
