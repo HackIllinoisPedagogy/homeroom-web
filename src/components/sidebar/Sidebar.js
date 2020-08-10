@@ -237,6 +237,9 @@ class Sidebar extends Component {
                 if(groupSize > studentCount) {
                     alert("Group size too large");
                     return;
+                } else if(groupSize <= 0) {
+                    alert("Please enter a positive group size");
+                    return;
                 } else {
                     numGroups = Math.floor(studentCount / groupSize);
                 }

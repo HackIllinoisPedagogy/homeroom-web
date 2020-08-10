@@ -298,7 +298,6 @@ class Assignment extends React.Component {
 
     onTutorClick() {
         this.polyaCounts[this.state.curr_problem] += 1;
-        alert(this.polyaCounts[this.state.curr_problem]);
     }
     render() {
         if(this.state.submitted) {
