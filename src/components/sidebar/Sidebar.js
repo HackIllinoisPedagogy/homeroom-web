@@ -5,7 +5,7 @@ import {addDocument, auth, db, getDocument, setDocument, updateDocument} from '.
 import * as firebase from "firebase";
 import ClassSelector from "./ClassSelector";
 import {findAllInRenderedTree} from "react-dom/test-utils";
-import  _ from "lodash";
+import _ from "lodash";
 
 // const assignments = [
 //     { name: 'Problem Set #1' },
@@ -149,7 +149,7 @@ class Sidebar extends Component {
     }
 
     makeClassOnFirebase = async () => {
-        if(this.state.className === "") {
+        if (this.state.className === "") {
             alert("Please Enter a Class Code");
             return;
         }
@@ -180,7 +180,7 @@ class Sidebar extends Component {
     }
 
     addClassOnFirebase = async () => {
-        if(this.state.className === "") {
+        if (this.state.className === "") {
             alert("Please Enter a Class Code");
             return;
         }
@@ -321,7 +321,7 @@ class Sidebar extends Component {
     renderClassesSidebar = () => {
 
         if (!this.state.doc) {
-            return (<div>No Docs</div>)
+            return (<div/>)
         }
 
         const {role} = this.state.doc;
@@ -371,7 +371,14 @@ class Sidebar extends Component {
 
     renderMainSidebar() {
         if (!this.state.doc) {
-            return (<div>No Docs</div>)
+            return (
+                <div className="flex justify-center w-full"
+                     style={{
+                         'height': `${window.innerHeight}px`
+                     }}
+                >
+                    <div className="self-center lds-dual-ring"/>
+                </div>)
         }
 
         const {role} = this.state.doc;

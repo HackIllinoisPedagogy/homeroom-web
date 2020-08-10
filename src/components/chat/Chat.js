@@ -1,12 +1,9 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import _ from 'lodash';
-import { addMessageToConversation, getMessagesFromConversation, getConversationsById } from '../messagingData';
+import {addMessageToConversation, getMessagesFromConversation, getConversationsById} from '../messagingData';
 import Message from './Message';
-import { db, getDocument } from '../../services/firebase';
-import { animateScroll } from "react-scroll";
-
-
-
+import {db, getDocument} from '../../services/firebase';
+import {animateScroll} from "react-scroll";
 
 
 class Chat extends Component {
@@ -22,7 +19,6 @@ class Chat extends Component {
             added: false,
         }
     }
-
 
 
     scrollToBottom() {
@@ -58,10 +54,10 @@ class Chat extends Component {
             return;
         }
 
-        const { user: { uid } } = this.props;
+        const {user: {uid}} = this.props;
         const userDoc = await getDocument('users', uid);
         if (userDoc.exists) {
-            this.setState({ currentUser: userDoc.data() });
+            this.setState({currentUser: userDoc.data()});
         }
 
 
@@ -70,7 +66,7 @@ class Chat extends Component {
     async componentDidMount() {
         this.scrollToBottom();
         await this.getCurrentUser();
-        const { activeChatId } = this.props;
+        const {activeChatId} = this.props;
         const messagesSnapshot = await db.collection("chats")
             .doc(activeChatId)
             .collection("messages")
@@ -78,11 +74,11 @@ class Chat extends Component {
                 let myDataArray = [];
                 if (snapshot.size) {
                     snapshot.forEach(doc =>
-                        myDataArray.push({ ...doc.data() })
+                        myDataArray.push({...doc.data()})
                     );
                     console.log(myDataArray);
                     myDataArray.sort(this.compare);
-                    this.setState({ messages: myDataArray });
+                    this.setState({messages: myDataArray});
 
                 } else {
                     console.log("err")
@@ -106,31 +102,29 @@ class Chat extends Component {
     }
 
     getMembers = async () => {
-        const { activeChatId } = this.props;
+        const {activeChatId} = this.props;
         let members = [];
-        for(let i = 0; i < this.state.chatInfo.members.length; i++) {
+        for (let i = 0; i < this.state.chatInfo.members.length; i++) {
             const userRef = (await getDocument("users", this.state.chatInfo.members[i])).data();
             members.push({
                 name: userRef.name,
                 role: userRef.role
             });
         }
-        this.setState({ members });
+        this.setState({members});
     }
 
     getConversationsById = async (activeChatId) => {
         const chat = await getDocument('chats', activeChatId);
         if (chat.exists) {
             console.log("cat", chat.data());
-            this.setState({ chatInfo: chat.data() });
+            this.setState({chatInfo: chat.data()});
         }
     }
 
 
-
-
     renderChatHistory() {
-        const { activeChatId, user: { uid } } = this.props;
+        const {activeChatId, user: {uid}} = this.props;
 
         if (!this.state.messages) {
             return <div>No messages</div>
@@ -138,16 +132,15 @@ class Chat extends Component {
 
 
         return this.state.messages.map(message => {
-            return <Message uid={uid} message={message} />
+            return <Message uid={uid} message={message}/>
         });
-
 
 
     }
 
     addMessage = (e) => {
         e.preventDefault();
-        const { activeChatId, user } = this.props;
+        const {activeChatId, user} = this.props;
         const message = {
             body: this.state.message,
             sentById: user.uid,
@@ -160,7 +153,7 @@ class Chat extends Component {
     }
 
     render() {
-        const { activeChatId, user } = this.props;
+        const {activeChatId, user} = this.props;
         if (!activeChatId || !user || !this.state.chatInfo) {
             return <div>No Active chat or user</div>;
         }
@@ -168,9 +161,8 @@ class Chat extends Component {
             console.log(this.state.members, this.state.members.length);
         }
         if (!this.state.added) {
-            this.setState({ added: true });
+            this.setState({added: true});
         }
-
 
 
         return (
@@ -209,7 +201,7 @@ class Chat extends Component {
                             </span>
                             <div class="text-p-medium-gray font-thin text-sm">
                                 Enjoy chatting!
-                  	</div>
+                            </div>
                         </div>
                     </div>
 
@@ -219,33 +211,43 @@ class Chat extends Component {
                     </div>
 
                     <form onSubmit={this.addMessage} class="flex m-6 overflow-hidden">
-                        <div style={{ borderColor: '#7754F8' }} class="flex w-full items-center border-b border-teal-500 p-8 mb-4 rounded shadow bg-white">
+                        <div style={{borderColor: '#7754F8'}}
+                             class="flex w-full items-center border-b border-teal-500 p-8 mb-4 rounded shadow bg-white">
                             {/* <span class="text-3xl text-grey px-3 border-r-2 border-grey">+</span>
                     <input type="text" class="w-full px-4" placeholder="Message to #general" /> */}
-                            <input class="appearance-none bg-transparent border-none w-full text-gray-700 px-4 leading-tight focus:outline-none" type="text" placeholder="Send a message..." value={this.state.message} onChange={(e) => this.setState({ message: e.target.value })} />
-                            <button style={{ borderColor: '#7754F8', backgroundColor: '#7754F8' }} class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
-                                Send</button>
+                            <input
+                                class="appearance-none bg-transparent border-none w-full text-gray-700 px-4 leading-tight focus:outline-none"
+                                type="text" placeholder="Send a message..." value={this.state.message}
+                                onChange={(e) => this.setState({message: e.target.value})}/>
+                            <button style={{borderColor: '#7754F8', backgroundColor: '#7754F8'}}
+                                    class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded"
+                                    type="submit">
+                                Send
+                            </button>
                         </div>
                     </form>
                 </div>
                 <div className="w-2/6 flex flex-col justify-center h-screen items-center">
                     <p className="px-2 text-p-dark-blue font-bold mb-2 text-2xl text-left font-thin px-4 pt-3">Members</p>
-                    <div className="w-10/12 justify-center shadow rounded-lg flex flex-col bg-white p-3 h-64 overflow-y-auto">
+                    <div
+                        className="w-10/12 justify-center shadow rounded-lg flex flex-col bg-white p-3 h-64 overflow-y-auto">
 
-                        <div className="my-5 px-3" style={{'height' : '100%'}}>
+                        <div className="my-5 px-3" style={{'height': '100%'}}>
                             {this.state.members ? this.state.members.map(member => {
                                 console.log(member.name);
                                 return <div class="flex justify-between px-2 py-2">
                                     <p class="flex text-gray-700">
                                         <svg class="w-2 text-gray-500 mx-2" viewBox="0 0 8 8" fill="currentColor">
-                                            <circle cx="4" cy="4" r="3" />
+                                            <circle cx="4" cy="4" r="3"/>
                                         </svg>
                                         {member.name}
                                     </p>
                                     <p class="text-gray-500 font-thin">{_.startCase(member.role)}</p>
                                 </div>
 
-                            }) : <div>Loading</div>}
+                            }) : <div className="w-full h-full flex flex-col justify-center">
+                                <div className="self-center lds-dual-ring"/>
+                            </div>}
                         </div>
 
                     </div>
