@@ -38,7 +38,7 @@ class Dashboard extends Component {
                         code: userDoc.data().classes[0].code,
                         name: userDoc.data().classes[0].name,
                     })
-                    const temp_classRef = await getDocument("classes", userDoc.data().classes[0].code);
+                    const temp_classRef = await getDocument("classes", userDoc.data().classes[0].code + "");
                     this.setNumStudents(temp_classRef.data().members.length - 1);
                 } else {
                     this.props.history.push("/landing");
