@@ -17,6 +17,25 @@ function SignUp(props) {
     const img = new Image();
     img.src = "../../images/logo.svg";
 
+    const signUp = () => {
+        auth.createUserWithEmailAndPassword(email, password).then(() => {
+            const role = isStudent ? "student" : "teacher";
+            db.collection("users").doc(auth.currentUser.uid).set(
+                {
+                    role: role,
+                    classes: [],
+                    name: name
+                }
+            ).then(() => {
+                auth.signInWithEmailAndPassword(email, password).then(() => {
+                    props.history.push("/dashboard");
+                });
+            })
+        }).catch(error => {
+            setErrorDiv(makeErrorDiv(error.message));
+        })
+    };
+
     const makeErrorDiv = function (message) {
         return (
             <div className="w-1/3 self-center bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
@@ -37,27 +56,11 @@ function SignUp(props) {
     }
 
     return (
-        <div style={{
+        <form style={{
             'height': window.innerHeight + "px",
-        }} onKeyDown={(event) => {
-            auth.createUserWithEmailAndPassword(email, password).then(() => {
-                const role = isStudent ? "student" : "teacher";
-                db.collection("users").doc(auth.currentUser.uid).set(
-                    {
-                        role: role,
-                        classes: [],
-                        name: name
-                    }
-                ).then(() => {
-                    auth.signInWithEmailAndPassword(email, password).then(() => {
-                        props.history.push("/dashboard");
-                    });
-                })
-            }).catch(error => {
-                setErrorDiv(makeErrorDiv(error.message));
-            })
-        }}
-        >
+        }} onSubmit={signUp} onKeyDown={(e) => {
+            if(e.keyCode === 13) signUp();
+        }}>
             <div className="flex w-full justify-center flex p-3"
                  style={{
                      'height': '10%'
@@ -99,24 +102,7 @@ function SignUp(props) {
                 </form>
                 <button
                     className="self-center w-1/3 rounded bg-p-orange hover:bg-orange-700 border-p-orange hover:border-orange-700 mt-3 py-1 px-2 border-4 text-sm text-white hover:shadow-inner"
-                    onClick={() => {
-                        auth.createUserWithEmailAndPassword(email, password).then(() => {
-                            const role = isStudent ? "student" : "teacher";
-                            db.collection("users").doc(auth.currentUser.uid).set(
-                                {
-                                    role: role,
-                                    classes: [],
-                                    name: name
-                                }
-                            ).then(() => {
-                                auth.signInWithEmailAndPassword(email, password).then(() => {
-                                    props.history.push("/dashboard");
-                                });
-                            })
-                        }).catch(error => {
-                            setErrorDiv(makeErrorDiv(error.message));
-                        })
-                    }}>
+                    type="submit">
                     Sign Up!
                 </button>
                 <button
@@ -129,7 +115,7 @@ function SignUp(props) {
                 </button>
                 {errorDiv}
             </div>
-        </div>
+        </form>
     );
 }
 
