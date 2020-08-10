@@ -397,7 +397,9 @@ class Sidebar extends Component {
                 const {id, name} = assignment;
                 return (
                     <li class="my-px" key={id}>
-                        <a onClick={() => this.props.setActive({name: 'assignment', id})}
+                        <a onClick={() => {
+                            this.props.setActive({name: 'assignment', id});
+                        }}
                            class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
                             <span className="ml-3">{name}</span>
                         </a>
