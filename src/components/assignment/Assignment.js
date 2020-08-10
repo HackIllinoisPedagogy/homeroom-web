@@ -23,22 +23,44 @@ class ProblemSet {
 class LatexField extends React.Component {
     constructor(props) {
         super(props)
-
         this.state = {
-            latex: '',
+            latex: '\\text{Type your answer here...}',
         }
+    }
+
+    mathquillDidMount() {
+        this.EditableMathField.focus();
+        autosize(this.EditableMathField);
+    }
+
+    handleSubmit(event) {
+        alert('Your answer was submitted: ' + this.state.value);
+        event.preventDefault();
     }
 
     render() {
         return (
-            <EditableMathField
-                placeholder="Type in your answer here..."
-                latex={this.state.latex} // latex value for the input field
-                onChange={(mathField) => {
-                    // called everytime the input changes
-                    this.setState({latex: mathField.latex()})
-                }}
-            />
+            <form onSubmit={this.handleSubmit}>
+                <label className="font-bold">Answer:<br/></label>
+                <div id="input-container" className="h-auto">
+                    <EditableMathField
+                        className="bg-transparent border-none max-h-75 min-h-38 w-full"
+                        latex={this.state.latex} // latex value for the input field
+                        ref={c => (this.EditableMathField = c)}
+                        onChange={(mathField) => {
+                            // called everytime the input changes
+                            this.setState({latex: mathField.latex()})
+                        }}
+                    />
+                </div>
+
+                <br/>
+                <div id="button-container" className="w-full h-auto flex pt-5 justify-end">
+                    <input className="bg-custom-purple text-gray-100 w-1/5 shadow-md text-center h-8"
+                            type="submit" value="Submit"/>
+                </div>
+
+            </form>
         )
     }
 }
@@ -178,8 +200,8 @@ class Assignment extends React.Component {
                         </div>
                         <div id="response" className="px-16 py-10">
                             <StudentForm/>
+                            <LatexField/>
                         </div>
-                        <div><LatexField/></div>
                     </div>
                     <div id="tutor-spacing" className="h-64 float-right w-2/5">
                     </div>
