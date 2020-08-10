@@ -5,6 +5,7 @@ import {addDocument, auth, db, getDocument, setDocument, updateDocument} from '.
 import * as firebase from "firebase";
 import ClassSelector from "../ClassSelector";
 import {findAllInRenderedTree} from "react-dom/test-utils";
+import  _ from "lodash";
 
 // const assignments = [
 //     { name: 'Problem Set #1' },
@@ -58,6 +59,11 @@ class Sidebar extends Component {
             }
         });
 
+        let assignmentVariable = await this.getAssignments();
+        let chatVariable = await this.getChats();
+
+        this.setAssignments(assignmentVariable);
+        this.setChats(chatVariable);
     }
 
 
@@ -75,13 +81,13 @@ class Sidebar extends Component {
         }
 
         let assignmentVariable = await this.getAssignments();
-        let chatVariable = await this.getChats()
+        let chatVariable = await this.getChats();
 
-        if (!this.state.assignments && this.state.assignments != assignmentVariable) {
+        if (!_.isEqual(assignmentVariable, this.state.assignments)) {
             this.setAssignments(assignmentVariable);
         }
 
-        if (!this.state.chats && this.state.chats != chatVariable) {
+        if (!_.isEqual(chatVariable, this.state.chats)) {
             this.setChats(chatVariable);
         }
 
@@ -108,8 +114,9 @@ class Sidebar extends Component {
             return;
         }
 
+        console.log(this.props.currentClass.code);
         let classRef = await getDocument("classes", this.props.currentClass.code + "");
-
+        console.log(classRef.data());
 
         for (let assignmentId of classRef.data().assignments) {
             let assignmentRef = await db.collection("assignments").doc(assignmentId).get();
