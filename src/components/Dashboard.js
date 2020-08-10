@@ -9,7 +9,7 @@ import Sidebar from './sidebar/Sidebar';
 class Dashboard extends Component {
 
     state = {
-        active: {name: 'chat', id: 'conv1'},
+        active: '',
         activeChatId: '',
         createAssignment: false,
         activeAssigmentId: '',
@@ -27,18 +27,17 @@ class Dashboard extends Component {
     setUser = user => this.setState({user: user});
 
     componentDidMount() {
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async user => {
             if (user) {
-                db.collection("users").doc(user.uid).get().then(doc => {
-                    if (doc.data().classes.length >= 0) {
-                        this.setState({
-                            user: user,
-                            currentClass: doc.data().classes[0],
-                        })
-                    } else {
-                        this.setUser(user);
-                    }
-                })
+                const userDoc = await getDocument("users", user.uid + "");
+                if(userDoc.data().classes.length > 0) {
+                    this.setClass({
+                        code: userDoc.data().classes[0].code,
+                        name: userDoc.data().classes[0].name,
+                    })
+                } else {
+                    this.props.history.push("/landing");
+                }
                 this.setUser(user);
             } else {
                 this.props.history.push('/');
@@ -50,14 +49,14 @@ class Dashboard extends Component {
 
         let display;
         if(this.state.active.name === "chat"){
-            display = <Chat activeChatId={this.state.active.id} />
+            display = <Chat user={this.state.user} activeChatId={this.state.active.id} />
             
         }
         else if(this.state.active.name === "assignment"){
-            display = <Assignment activeAssignmentId={this.state.active.id} />   
+            display = <Assignment user={this.state.user} activeAssignmentId={this.state.active.id} />   
         }
         else if(this.state.active.name === "create"){
-            display = <CreateAssignment currentClass={this.state.currentClass}/>
+            display = <CreateAssignment user={this.state.user} currentClass={this.state.currentClass}/>
             
         }
         // add for All Class once Firebase is in
@@ -65,7 +64,7 @@ class Dashboard extends Component {
         return (
             <div class="overflow-y-auto">
                 <Sidebar user={this.state.user} setActive={this.setActive} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
-                <div id="dashboard-inner-container" className="pt-10">
+                <div id="dashboard-inner-container">
                     {display}
                 </div>
             </div>

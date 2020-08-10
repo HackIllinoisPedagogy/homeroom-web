@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
-import { slide as Menu } from 'react-burger-menu';
-import { getConversations, getAssignments } from '../messagingData';
-import { auth, db, getDocument } from '../../services/firebase';
+import React, {Component} from 'react';
+import {slide as Menu} from 'react-burger-menu';
+import {getConversations, getAssignments} from '../messagingData';
+import {addDocument, auth, db, getDocument, setDocument, updateDocument} from '../../services/firebase';
 import * as firebase from "firebase";
 import ClassSelector from "../ClassSelector";
+import {findAllInRenderedTree} from "react-dom/test-utils";
 
 // const assignments = [
 //     { name: 'Problem Set #1' },
@@ -32,21 +33,21 @@ class Sidebar extends Component {
     };
 
     setAssignments(assignments) {
-        this.setState({ assignments });
+        this.setState({assignments});
     }
 
-    setChats(chats){
-        this.setState({ chats });
+    setChats(chats) {
+        this.setState({chats});
     }
 
     setClassName(name) {
-        this.setState({ className: name });
+        this.setState({className: name});
     }
 
     async componentDidMount() {
 
         const setUser = (user) => {
-            this.setState({ user });
+            this.setState({user});
         }
 
         auth.onAuthStateChanged(function (user) {
@@ -69,7 +70,7 @@ class Sidebar extends Component {
                 console.log("no doc");
             }
 
-            this.setState({ doc: doc.data() })
+            this.setState({doc: doc.data()})
 
         }
 
@@ -84,17 +85,15 @@ class Sidebar extends Component {
             this.setChats(chatVariable);
         }
 
-        
-
 
     }
 
     createClass = () => {
-        this.setState({ createClassModal: true })
+        this.setState({createClassModal: true})
     }
 
     addClass = () => {
-        this.setState({ addClassModal: true })
+        this.setState({addClassModal: true})
     }
 
     map_func = async (id) => {
@@ -109,12 +108,14 @@ class Sidebar extends Component {
             return;
         }
 
-        let classRef = await getDocument("classes", this.props.currentClass.code);
+        let classRef = await getDocument("classes", this.props.currentClass.code + "");
+
 
         for (let assignmentId of classRef.data().assignments) {
             let assignmentRef = await db.collection("assignments").doc(assignmentId).get();
-            toReturn.push( {...assignmentRef.data(), id: assignmentId});
-        };
+            toReturn.push({...assignmentRef.data(), id: assignmentId});
+        }
+
 
         return toReturn;
     }
@@ -126,18 +127,86 @@ class Sidebar extends Component {
             return;
         }
 
-        let classRef = await getDocument("classes", this.props.currentClass.code);
-
+        let classRef = await getDocument("classes", this.props.currentClass.code + "");
+        let allChatRef = await getDocument("chats", classRef.data().allChat + "");
+        toReturn.push({
+            ...allChatRef.data(),
+            id: classRef.data().allChat
+        })
         for (let chatId of classRef.data().chats) {
             let chatRef = await db.collection("chats").doc(chatId).get();
             toReturn.push({...chatRef.data(), id: chatId});
-        };
+        }
 
         return toReturn;
     }
 
+    makeClassOnFirebase = async () => {
+        if(this.state.className === "") {
+            alert("Please Enter a Class Code");
+            return;
+        }
+        const code = Math.round(Math.random() * 1000000);
+        const chatRef = await addDocument("chats", {
+            name: `${this.state.className} Class Chat`,
+            members: [this.props.user.uid]
+        })
+        await setDocument("classes", code + "", {
+            name: this.state.className,
+            members: [this.props.user.uid],
+            allChat: chatRef.id,
+            chats: [],
+            assignments: []
+        });
+        await updateDocument("users", this.props.user.uid, {
+            classes: firebase.firestore.FieldValue.arrayUnion({
+                code: code,
+                name: this.state.className
+            })
+        })
+        const docRef = await getDocument("users", this.props.user.uid);
+        this.setState({
+            doc: docRef.data(),
+            createClassModal: false,
+            className: ""
+        })
+    }
 
+    addClassOnFirebase = async () => {
+        if(this.state.className === "") {
+            alert("Please Enter a Class Code");
+            return;
+        }
+        const classRef = await getDocument("classes", this.state.className);
+        if (!classRef.exists) {
+            alert("Invalid Class Code");
+            return;
+        }
+        if (classRef.data().members.includes(this.props.user.uid)) {
+            alert("You are already in this class");
+            return;
+        }
+        await updateDocument("classes", this.state.className, {
+            members: firebase.firestore.FieldValue.arrayUnion(this.props.user.uid)
+        })
+        await updateDocument("users", this.props.user.uid, {
+            classes: firebase.firestore.FieldValue.arrayUnion({
+                code: this.state.className,
+                name: classRef.data().name
+            })
+        });
 
+        await updateDocument("chats", classRef.data().allChat + "", {
+            members: firebase.firestore.FieldValue.arrayUnion(this.props.user.uid),
+        })
+
+        const userRef = await getDocument("user", this.props.user.uid + "");
+        this.setState({
+            doc: userRef.data(),
+            addClassModal: false,
+            className: ""
+        })
+    }
 
     renderCreateClassModal() {
         return (
@@ -164,7 +233,7 @@ class Sidebar extends Component {
                                     <input
                                         class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                                         id="grid-first-name" type="text" placeholder="Enter class name..."
-                                        value={this.state.className} onChange={e => this.setClassName(e.target.value)} />
+                                        value={this.state.className} onChange={e => this.setClassName(e.target.value)}/>
                                 </div>
                             </div>
                         </div>
@@ -172,36 +241,15 @@ class Sidebar extends Component {
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                         <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                             <button type="button"
-                                class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-p-purple text-base leading-6 font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5"
-                                onClick={() => {
-                                    const code = Math.round(Math.random() * 1000000);
-                                    db.collection("classes").doc(code + "").set({
-                                        name: this.state.className,
-                                        members: [this.props.user.uid]
-                                    }).then(() => {
-                                        db.collection("users").doc(this.props.user.uid).update({
-                                            classes: firebase.firestore.FieldValue.arrayUnion({
-                                                code: code,
-                                                name: this.state.className,
-                                            }),
-                                        }).then(() => {
-                                            db.collection("users").doc(this.props.user.uid).get().then(doc => {
-                                                this.setState({
-                                                    doc: doc.data(),
-                                                    createClassModal: false,
-                                                    className: ""
-                                                })
-                                            })
-                                        })
-                                    })
-                                }}
+                                    class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-p-purple text-base leading-6 font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+                                    onClick={() => this.makeClassOnFirebase()}
                             >
                                 Get Class Code
                             </button>
                         </span>
                         <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
-                            <button type="button" onClick={() => this.setState({ createClassModal: false })}
-                                class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                            <button type="button" onClick={() => this.setState({createClassModal: false})}
+                                    class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                 Cancel
                             </button>
                         </span>
@@ -236,7 +284,7 @@ class Sidebar extends Component {
                                     <input
                                         class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                                         id="grid-first-name" type="number" placeholder="Enter class code..."
-                                        value={this.state.className} onChange={e => this.setClassName(e.target.value)} />
+                                        value={this.state.className} onChange={e => this.setClassName(e.target.value)}/>
 
                                 </div>
                             </div>
@@ -245,45 +293,15 @@ class Sidebar extends Component {
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                         <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                             <button type="button"
-                                class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-p-purple text-base leading-6 font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5"
-                                onClick={() => {
-                                    db.collection("classes").doc(this.state.className).get().then(doc => {
-                                        if (doc.exists) {
-                                            if (!doc.data().members.includes(this.props.user.uid)) {
-                                                db.collection("classes").doc(this.state.className).update({
-                                                    members: firebase.firestore.FieldValue.arrayUnion(this.props.user.uid),
-                                                }).then(() => {
-                                                    db.collection("users").doc(this.props.user.uid).update({
-                                                        classes: firebase.firestore.FieldValue.arrayUnion({
-                                                            code: this.state.className,
-                                                            name: doc.data().name
-                                                        }),
-                                                    }).then(() => {
-                                                        db.collection("users").doc(this.props.user.uid).get().then(doc2 => {
-                                                            this.setState({
-                                                                doc: doc2.data(),
-                                                                addClassModal: false,
-                                                                className: ""
-                                                            })
-                                                        })
-                                                    })
-                                                });
-                                            } else {
-                                                alert("You are already in this class");
-                                            }
-
-                                        } else {
-                                            alert("Invalid Class Code");
-                                        }
-                                    })
-                                }}
+                                    class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-p-purple text-base leading-6 font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+                                    onClick={() => this.addClassOnFirebase()}
                             >
                                 Join Class
                             </button>
                         </span>
                         <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
-                            <button type="button" onClick={() => this.setState({ addClassModal: false })}
-                                class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                            <button type="button" onClick={() => this.setState({addClassModal: false})}
+                                    class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                 Cancel
                             </button>
                         </span>
@@ -299,18 +317,19 @@ class Sidebar extends Component {
             return (<div>No Docs</div>)
         }
 
-        const { role } = this.state.doc;
+        const {role} = this.state.doc;
         let classes;
         if (this.state.doc) {
             classes = this.state.doc.classes.map(c => {
                 return (
                     <li>
-                        <ClassSelector name={c.name} code={c.code} setClass={this.props.setClass} currentClass={this.props.currentClass} />
+                        <ClassSelector name={c.name} code={c.code} setClass={this.props.setClass}
+                                       currentClass={this.props.currentClass}/>
                     </li>
                 )
             });
         } else {
-            classes = <div />;
+            classes = <div/>;
         }
 
         return (
@@ -320,18 +339,18 @@ class Sidebar extends Component {
                     <ul class="flex flex-col w-full">
                         <li class="my-px">
                             <a onClick={role === "teacher" ? this.createClass : this.addClass}
-                                class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 bg-gray-100">
+                               class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 bg-gray-100">
                                 <span class="flex items-center justify-center text-lg text-gray-400">
                                     <svg fill="none"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        class="h-6 w-6">
+                                         stroke-linecap="round"
+                                         stroke-linejoin="round"
+                                         stroke-width="2"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor"
+                                         class="h-6 w-6">
                                         <path
-                                            d="M8 3.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H4a.5.5 0 0 1 0-1h3.5V4a.5.5 0 0 1 .5-.5z" />
-                                        <path d="M7.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0V8z" />
+                                            d="M8 3.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H4a.5.5 0 0 1 0-1h3.5V4a.5.5 0 0 1 .5-.5z"/>
+                                        <path d="M7.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0V8z"/>
                                     </svg>
                                 </span>
                             </a>
@@ -348,9 +367,9 @@ class Sidebar extends Component {
             return (<div>No Docs</div>)
         }
 
-        const { role } = this.state.doc;
+        const {role} = this.state.doc;
 
-        const { currentClass } = this.props;
+        const {currentClass} = this.props;
 
         if (!currentClass) {
             return <div>Loading...</div>
@@ -361,52 +380,53 @@ class Sidebar extends Component {
 
         if (this.state.assignments && this.state.assignments.length) {
             assignmentList = this.state.assignments.map(assignment => {
-                    const { id, name } = assignment;
-                    return (
-                        <li class="my-px" key={id}>
-                            <a onClick={() => this.props.setActive({ name: 'assignment', id })}
-                                class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
-                                <span className="ml-3">{name}</span>
-                            </a>
-                        </li>);
-                })
+                const {id, name} = assignment;
+                return (
+                    <li class="my-px" key={id}>
+                        <a onClick={() => this.props.setActive({name: 'assignment', id})}
+                           class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
+                            <span className="ml-3">{name}</span>
+                        </a>
+                    </li>);
+            })
         }
 
         if (this.state.chats && this.state.chats.length) {
             chatList = this.state.chats.map(chat => {
-                    const { id, name } = chat;
-                    console.log(chat);
-                    return (
-                        <li class="my-px" key={id}>
-                            <a onClick={() => this.props.setActive({ name: 'chat', id })}
-                                class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
-                                <span className="ml-3">{name}</span>
-                            </a>
-                        </li>);
-                })
+                const {id, name} = chat;
+                console.log(chat);
+                return (
+                    <li class="my-px" key={id}>
+                        <a onClick={() => this.props.setActive({name: 'chat', id})}
+                           class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
+                            <span className="ml-3">{name}</span>
+                        </a>
+                    </li>);
+            })
         }
 
 
-
-
         return (
-            <div style={{ width: '300px' }}
-                class="fixed  overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
+            <div style={{width: '300px'}}
+                 class="fixed  overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
                 <div class="flex max-w-xs p-4 bg-white">
                     <ul class="flex flex-col">
                         <div class="mb-6">
                             <li class="h-10 my-px">
-                                <span className="ml-4 text-2xl text-p-dark-blue font-bold"> {this.props.currentClass.name}</span>
+                                <span
+                                    className="ml-4 text-2xl text-p-dark-blue font-bold"> {this.props.currentClass.name}</span>
                             </li>
                             <li class="h-5 my-px">
                                 <span className="ml-4 text-p-medium-gray">{this.state.doc.name}</span>
                             </li>
                             {role === 'teacher' ? <li class="h-5  my-px">
-                                <span className="ml-4 text-p-medium-gray">Class Code: {this.props.currentClass.code}</span>
+                                <span
+                                    className="ml-4 text-p-medium-gray">Class Code: {this.props.currentClass.code}</span>
                             </li> : ''}
                         </div>
                         <li class="my-px">
-                            <div class="flex flex-row items-center h-12 px-4 w-auto rounded-lg text-gray-600 bg-p-light-purple">
+                            <div
+                                class="flex flex-row items-center h-12 px-4 w-auto rounded-lg text-gray-600 bg-p-light-purple">
                                 <span class="ml-3 text-p-purple">32 Students</span>
 
                             </div>
@@ -420,16 +440,16 @@ class Sidebar extends Component {
                         {assignmentList}
 
                         {role === "teacher" ? <li class="my-px">
-                            <a onClick={() => this.props.setActive({ name: 'create' })}
-                                class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple">
+                            <a onClick={() => this.props.setActive({name: 'create'})}
+                               class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple">
                                 <span class="flex items-center justify-center text-lg text-p-purple">
                                     <svg fill="none"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        class="h-6 w-6">
+                                         stroke-linecap="round"
+                                         stroke-linejoin="round"
+                                         stroke-width="2"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor"
+                                         class="h-6 w-6">
                                         <path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </span>
@@ -449,26 +469,26 @@ class Sidebar extends Component {
                                     this.props.history.push("/");
                                 })
                             }}
-                                class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-gray-100">
+                               class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-gray-100">
                                 <span class="flex items-center justify-center text-lg text-red-400"
                                 >
                                     <svg fill="none"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                        class="h-6 w-6">
+                                         stroke-linecap="round"
+                                         stroke-linejoin="round"
+                                         stroke-width="2"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor"
+                                         class="h-6 w-6">
                                         <path
                                             d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
                                     </svg>
                                 </span>
-                                <span class="ml-3" >Logout</span>
+                                <span class="ml-3">Logout</span>
                             </a>
                         </li>
                     </ul>
                 </div>
-            </div >
+            </div>
         );
     }
 

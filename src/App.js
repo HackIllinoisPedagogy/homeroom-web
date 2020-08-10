@@ -14,6 +14,7 @@ import SignUp from "./components/auth/SignUp";
 import Assignment, { ProblemSet } from './components/assignment/Assignment'
 import TeacherAssignment from "./components/assignment/TeacherAssignment";
 import CreateAssignment from './components/assignment/CreateAssignment'
+import Landing from "./components/Landing";
 
 
 
@@ -30,6 +31,7 @@ function App() {
         <Route path="/dashboard" component={Dashboard}></Route>
         <Route path="/teacherassignment" component={TeacherAssignment}/>
         <Route path="/assignment" component={Assignment}/>
+        <Route path="/landing" component={Landing}/>
       </Switch>
     </Router>
   );
