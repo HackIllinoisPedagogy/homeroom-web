@@ -427,7 +427,7 @@ class Sidebar extends Component {
                         <li class="my-px">
                             <div
                                 class="flex flex-row items-center h-12 px-4 w-auto rounded-lg text-gray-600 bg-p-light-purple">
-                                <span class="ml-3 text-p-purple">32 Students</span>
+                                <span class="ml-3 text-p-purple">{this.props.numStudents} Students</span>
 
                             </div>
                         </li>

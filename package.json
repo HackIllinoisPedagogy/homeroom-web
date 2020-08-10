@@ -19,6 +19,7 @@
     "react-burger-menu": "^2.7.1",
     "react-dom": "^16.13.1",
     "react-katex": "^2.0.2",
+    "react-mathquill": "^0.2.6",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
     "react-scroll": "^1.8.0",
