@@ -55,7 +55,7 @@ class Tutor extends React.Component {
 				<h3 id="tutor-name" className="text-xl font-semibold"> Ask Polya </h3>
 				<div id="accent" className="h-1 w-1/4 bg-custom-purple mt-1"></div>
 				<form id="user-input" className="mt-5">
-					<textarea id="user-state" className="text-gray-700 focus:outline-none w-full h-full pl-3 pt-3 bg-white shadow-md rounded"
+					<textarea id="user-state" className="text-gray-700 focus:outline-none w-full h-full p-3 bg-white shadow-md rounded"
 							  type="text" rows="7" placeholder="What have you tried so far to solve the problem?"/>
 				</form>
 				<div id="button-container" className="w-full h-auto flex pt-5 justify-end">
