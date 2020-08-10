@@ -17,7 +17,8 @@ class Chat extends Component {
         this.state = {
             message: '',
             messages: null,
-            chatInfo: null
+            chatInfo: null,
+            currentUser: null
         }
     }
 
@@ -43,8 +44,31 @@ class Chat extends Component {
         return 0;
     }
 
+    // getNameFromMessageId = async (uid) => {
+    //     const user = await getDocument('users', uid);
+    //     if (user.exists) {
+    //         console.log(name);
+    //         setName(user.name);
+    //     }
+    // }
+
+    getCurrentUser = async () => {
+        if (!this.props.user) {
+            return;
+        }
+
+        const { user: { uid } } = this.props;
+        const userDoc = await getDocument('users', uid);
+        if (userDoc.exists) {
+            this.setState({ currentUser: userDoc.data() });
+        }
+
+
+    }
+
     async componentDidMount() {
         this.scrollToBottom();
+        this.getCurrentUser();
         const { activeChatId } = this.props;
         const messagesSnapshot = await db.collection("chats")
             .doc(activeChatId)
@@ -57,7 +81,7 @@ class Chat extends Component {
                     );
                     console.log(myDataArray);
                     myDataArray.sort(this.compare);
-                    this.setState({ messages: myDataArray })
+                    this.setState({ messages: myDataArray });
 
                 } else {
                     console.log("err")
@@ -83,12 +107,16 @@ class Chat extends Component {
     }
 
 
+
+
     renderChatHistory() {
         const { activeChatId, user: { uid } } = this.props;
 
         if (!this.state.messages) {
             return <div>No messages</div>
         }
+
+
         return this.state.messages.map(message => {
             return <Message uid={uid} message={message} />
         });
@@ -102,7 +130,8 @@ class Chat extends Component {
         const { activeChatId, user } = this.props;
         const message = {
             body: this.state.message,
-            sentBy: user.uid,
+            sentById: user.uid,
+            sentByName: this.state.currentUser.name,
             createdOn: Date.now()
         };
         db.collection('chats').doc(activeChatId).collection('messages').add(message);
@@ -154,9 +183,6 @@ class Chat extends Component {
                         <div class="text-grey font-thin text-sm">
                             Chit-chattin' about ugly HTML and mixing of concerns.
                   	</div>
-                    </div>
-                    <div class="ml-auto hidden md:block">
-                        <input type="search" placeholder="Search" class="border border-grey rounded-lg p-2" />
                     </div>
                 </div>
 

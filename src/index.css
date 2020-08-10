@@ -133,16 +133,11 @@ Note: Beware of modifying this element as it can break the animations - you shou
 }
 
 #message-recieved {
-  background-color: #E3EAF2;
   float: left;
-  max-width: 75%;
 }
 
 #message-sent {
-  background-color: #7754F8;
-  color: white;
   float: right;
-  max-width: 75%;
 }
 
 #messages-div ::-webkit-scrollbar {display:none;}
