@@ -8,6 +8,7 @@ function ClassSelector(props) {
                      code: props.code,
                      name: props.name
                  });
+                 props.setActive('');
              }}
         >
             <span className="self-center text-center    ">

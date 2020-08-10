@@ -3,7 +3,7 @@ import {slide as Menu} from 'react-burger-menu';
 import {getConversations, getAssignments} from '../messagingData';
 import {addDocument, auth, db, getDocument, setDocument, updateDocument} from '../../services/firebase';
 import * as firebase from "firebase";
-import ClassSelector from "../ClassSelector";
+import ClassSelector from "./ClassSelector";
 import {findAllInRenderedTree} from "react-dom/test-utils";
 import  _ from "lodash";
 
@@ -331,7 +331,7 @@ class Sidebar extends Component {
                 return (
                     <li>
                         <ClassSelector name={c.name} code={c.code} setClass={this.props.setClass}
-                                       currentClass={this.props.currentClass}/>
+                                       currentClass={this.props.currentClass} setActive={this.props.setActive}/>
                     </li>
                 )
             });
