@@ -27,18 +27,17 @@ class Dashboard extends Component {
     setUser = user => this.setState({user: user});
 
     componentDidMount() {
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async user => {
             if (user) {
-                db.collection("users").doc(user.uid).get().then(doc => {
-                    if (doc.data().classes.length >= 0) {
-                        this.setState({
-                            user: user,
-                            currentClass: doc.data().classes[0],
-                        })
-                    } else {
-                        this.setUser(user);
-                    }
-                })
+                const userDoc = await getDocument("users", user.uid + "");
+                if(userDoc.data().classes.length > 0) {
+                    this.setClass({
+                        code: userDoc.data().classes[0].code,
+                        name: userDoc.data().classes[0].name,
+                    })
+                } else {
+                    this.props.history.push("/landing");
+                }
                 this.setUser(user);
             } else {
                 this.props.history.push('/');
