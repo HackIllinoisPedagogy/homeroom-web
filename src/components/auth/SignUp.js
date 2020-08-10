@@ -39,7 +39,25 @@ function SignUp(props) {
     return (
         <div style={{
             'height': window.innerHeight + "px",
-        }}>
+        }} onKeyDown={(event) => {
+            auth.createUserWithEmailAndPassword(email, password).then(() => {
+                const role = isStudent ? "student" : "teacher";
+                db.collection("users").doc(auth.currentUser.uid).set(
+                    {
+                        role: role,
+                        classes: [],
+                        name: name
+                    }
+                ).then(() => {
+                    auth.signInWithEmailAndPassword(email, password).then(() => {
+                        props.history.push("/dashboard");
+                    });
+                })
+            }).catch(error => {
+                setErrorDiv(makeErrorDiv(error.message));
+            })
+        }}
+        >
             <div className="flex w-full justify-center flex p-3"
                  style={{
                      'height': '10%'
