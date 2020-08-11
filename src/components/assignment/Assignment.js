@@ -46,7 +46,7 @@ class LatexField extends React.Component {
                 <label className="font-bold">Answer:<br/></label>
                 <div id="input-container" className="h-auto">
                     <EditableMathField
-                        className="bg-transparent border-none max-h-75 min-h-38 w-full"
+                        className="bg-transparent max-h-75 min-h-38 w-full"
                         latex={this.state.latex} // latex value for the input field
                         ref={c => (this.EditableMathField = c)}
                         onChange={(mathField) => {
@@ -57,7 +57,7 @@ class LatexField extends React.Component {
                 </div>
 
                 <br/>
-                <div id="button-container" className="w-full h-auto flex pt-5 justify-end">
+                <div id="button-container" className="w-full h-auto flex pt-1 justify-end">
                     <input className="bg-custom-purple text-gray-100 w-1/5 shadow-md text-center h-8"
                             type="submit" value="Submit"/>
                 </div>
