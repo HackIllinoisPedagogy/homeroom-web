@@ -2,9 +2,22 @@ import React, {useEffect, useState} from "react";
 import SubmissionCard from "./SubmissionCard";
 import {db, getCollection, getDocument} from "../../services/firebase";
 
-function TeacherAssignment() {
+function TeacherAssignment(props) {
     const [height, setHeight] = useState(0);
     const [completed, setCompleted] = useState(true);
+    const [assignment, setAssignment] = useState(null);
+
+    useEffect(() => {
+        updateAssignment().then(() => {
+            console.log("Teacher Assignment refreshed");
+        });
+    }, [props.activeAssignmentId]);
+
+    const updateAssignment = async () => {
+        const aRef = (await getDocument("assignments", props.activeAssignmentId)).data();
+        setAssignment(aRef);
+    }
+
     let completedDiv =
         <span className="text-gray-400" onClick={() => setCompleted(true)}>
             Completed
@@ -28,18 +41,24 @@ function TeacherAssignment() {
 
     useEffect(() => {
         console.log("hook");
-        setHeight(window.innerHeight - document.getElementById("assignmentInfo").clientHeight);
-    });
+        if (document.getElementById("assignmentInfo")) setHeight(window.innerHeight - document.getElementById("assignmentInfo").clientHeight);
+    }, [window.innerHeight, document.getElementById("assignmentInfo")]);
+
+    if (!assignment) {
+        return (
+            <div id="assignmentInfo" className="flex justify-center w-full"
+                 style={{'height': `${window.innerHeight}px`}}>
+                <div className="self-center lds-dual-ring"/>
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-col">
             <div id="assignmentInfo" className="flex flex-col px-32 pt-16">
-            <span className="text-3xl font-bold">
-                Assignment name
-            </span>
-                <span className="text-gray-500 w-3/5">
-                Assignment description
-            </span>
+                <span className="text-3xl font-bold">
+                    {assignment.name}
+                </span>
                 <div className="h-1 w-3/5 bg-gray-300 mt-3"/>
                 <div className="flex w-3/4 justify-between my-16">
                     <div className="flex flex-col">
@@ -52,7 +71,7 @@ function TeacherAssignment() {
                     </div>
                     <div className="flex flex-col">
                     <span className="self-center">
-                        Average Score
+                        Students Who Used Polya
                     </span>
                         <span className="text-6xl self-center   ">
                         82%
@@ -60,7 +79,7 @@ function TeacherAssignment() {
                     </div>
                     <div className="flex flex-col">
                     <span className="self-center">
-                        Average Score
+                        Average Attempts
                     </span>
                         <span className="text-6xl self-center   ">
                         82%
@@ -83,7 +102,7 @@ function TeacherAssignment() {
                         Score
                     </span>
                     <span className="text-gray-400 w-1/4">
-                        Percent
+                        Number of Attempts
                     </span>
                 </div>
             </div>

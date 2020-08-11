@@ -4,6 +4,7 @@ import Assignment from "./assignment/Assignment";
 import CreateAssignment from './assignment/CreateAssignment';
 import Chat from './chat/Chat';
 import Sidebar from './sidebar/Sidebar';
+import TeacherAssignment from "./assignment/TeacherAssignment";
 
 
 class Dashboard extends Component {
@@ -16,6 +17,7 @@ class Dashboard extends Component {
         user: null,
         currentClass: null,
         numStudents: 0,
+        role: "student",
     }
 
     setNumStudents = n => this.setState({numStudents: n})
@@ -29,10 +31,13 @@ class Dashboard extends Component {
 
     setUser = user => this.setState({user: user});
 
+    setRole = role => this.setState({role});
+
     componentDidMount() {
         auth.onAuthStateChanged(async user => {
             if (user) {
                 const userDoc = await getDocument("users", user.uid + "");
+                this.setRole(userDoc.data().role);
                 if(userDoc.data().classes.length > 0) {
                     this.setClass({
                         code: userDoc.data().classes[0].code,
@@ -64,7 +69,11 @@ class Dashboard extends Component {
             
         }
         else if(this.state.active.name === "assignment"){
-            display = <Assignment user={this.state.user} activeAssignmentId={this.state.active.id} />   
+            if(this.state.role === 'student') {
+                display = <Assignment user={this.state.user} activeAssignmentId={this.state.active.id}/>
+            } else {
+                display = <TeacherAssignment user={this.state.user} activeAssignmentId={this.state.active.id}/>
+            }
         }
         else if(this.state.active.name === "create"){
             display = <CreateAssignment user={this.state.user} currentClass={this.state.currentClass}/>
