@@ -10,6 +10,8 @@ import {addStyles, EditableMathField} from 'react-mathquill'
 import autosize from "autosize/dist/autosize";
 import {getDocument} from "../../services/firebase";
 
+import _ from "lodash";
+
 addStyles()
 
 class ProblemSet {
@@ -146,6 +148,16 @@ class Assignment extends React.Component {
         }
     }
 
+    async componentDidUpdate(prevProps, prevState, snapshot) {
+        console.log("Update");
+        let {activeAssignmentId} = prevProps;
+        if(this.props.activeAssignmentId !== activeAssignmentId) {
+            const aRef = (await getDocument("assignments", this.props.activeAssignmentId + "")).data();
+            this.changeProblem(0);
+            this.setProblemSet(aRef);
+        }
+    }
+
     getProblems(id) {
         const problemSet = getProblemsById(id);
         return <div>{problemSet.name}</div>
@@ -157,15 +169,9 @@ class Assignment extends React.Component {
 
     render() {
 
-        if(!this.state.problemSet) return null;
-
         console.log("here");
         let prob = this.state.problemSet;
-        const activeAssignmentId = "2";
-
-        // if(!activeAssignmentId){
-        // 	return (<div></div>);
-        // }
+        if(!prob) return <div/>;
 
         const options = this.state.problemSet.problems.map((val, key) => {
             return <option value={`${key}`}>{key + 1}</option>;
@@ -175,7 +181,6 @@ class Assignment extends React.Component {
 
         return (
             <div id="page">
-                <div>{activeAssignmentId}</div>
                 <div id="content" className="">
                     <div id="pset-title" className="px-16 py-20 w-3/5 float-left">
                         <h3 className="text-black font-bold text-4xl"> {prob.name} </h3>
@@ -206,7 +211,7 @@ class Assignment extends React.Component {
                     <div id="tutor-spacing" className="h-64 float-right w-2/5">
                     </div>
                     <div id="tutor-container" className="h-auto float-right w-2/5 flex justify-center">
-                        <Tutor problem={prob.problems[this.state.curr_problem]}></Tutor>
+                        <Tutor problem={prob.problems[this.state.curr_problem]}/>
                     </div>
                 </div>
             </div>
