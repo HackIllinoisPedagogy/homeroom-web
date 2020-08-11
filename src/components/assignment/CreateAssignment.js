@@ -11,7 +11,8 @@ class CreateAssignment extends Component {
             problems: [
                 {
                     question: '',
-                    solution: ''
+                    solution: '',
+                    answer: ''
                 }
             ]
         };
@@ -46,6 +47,14 @@ class CreateAssignment extends Component {
             this.setState({problems: array});
         }
 
+    }
+
+    onAnswerChange(i, e) {
+        let array = [...this.state.problems];
+        if (i != -1) {
+            array[i].answer = e.target.value;
+            this.setState({problems: array});
+        }
     }
 
     onSolutionChange(i, e) {
@@ -89,7 +98,7 @@ class CreateAssignment extends Component {
         ])
     }
 
-    createQuestionCard(index, initQuesVal, initAnswerVal) {
+    createQuestionCard(index, initQuesVal, initSolutionVal, initAnswerVal) {
         return (
             <div
                 class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all mb-8 sm:max-w-lg sm:w-full"
@@ -115,15 +124,27 @@ class CreateAssignment extends Component {
                             </div>
                             <div class="mt-2">
                                 <p class="text-sm leading-5 text-gray-500">
-                                    Enter the solution
+                                    Enter the steps
                                 </p>
                             </div>
                             <div class="mt-2 w-full">
                                 <input
                                     onChange={(e) => this.onSolutionChange(index, e)}
-                                    class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-8 leading-tight focus:outline-none focus:bg-white"
-                                    id="grid-first-name" type="text" value={initAnswerVal}
+                                    class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+                                    id="grid-first-name" type="text" value={initSolutionVal}
                                     placeholder="Enter solution..."/>
+                            </div>
+                            <div className="mt-2">
+                                <p className="text-sm leading-5 text-gray-500">
+                                    Enter your answer
+                                </p>
+                            </div>
+                            <div className="mt-2 w-full">
+                                <input
+                                    onChange={(e) => this.onAnswerChange(index, e)}
+                                    className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-8 leading-tight focus:outline-none focus:bg-white"
+                                    id="grid-first-name" type="text" value={initAnswerVal}
+                                    placeholder="Enter question..."/>
                             </div>
                             <div class="m-3">
                                 <button onClick={() => this.removeQuestion(index)}
@@ -164,7 +185,7 @@ class CreateAssignment extends Component {
 
                     this.state.problems.map((problem, i) => {
                         console.log("hello");
-                        return this.createQuestionCard(i, problem.question, problem.solution);
+                        return this.createQuestionCard(i, problem.question, problem.solution, problem.answer);
                     })
 
 
