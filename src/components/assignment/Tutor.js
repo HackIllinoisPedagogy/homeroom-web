@@ -5,6 +5,7 @@ import {InlineMath} from 'react-katex';
 import _ from "lodash";
 
 import {handleLatexRendering, generateRenderingArray} from './renderingUtils.js'
+import {getDocument, updateDocument} from "../../services/firebase";
 
 
 class Tutor extends React.Component {
@@ -15,6 +16,13 @@ class Tutor extends React.Component {
             hint: <div/>,
         };
         this.serverUrl = "http://127.0.0.1:5000/";
+    }
+
+    async onTutorClick() {
+        const docRef = (await getDocument(`assignments/${this.props.assignmentID}/attempts`, this.props.user.uid)).data();
+        await updateDocument(`assignments/${this.props.assignmentID}/attempts`, this.props.user.uid, {
+            usedPolya: docRef.usedPolya + 1,
+        })
     }
 
     componentDidMount() {
@@ -50,7 +58,8 @@ class Tutor extends React.Component {
             });
     }
 
-    handleClick() {
+    async handleClick() {
+        await this.onTutorClick();
         let data = {"state": document.getElementById("user-state").value};
 
         let query = Object.keys(data)

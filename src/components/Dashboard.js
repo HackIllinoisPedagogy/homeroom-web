@@ -65,7 +65,7 @@ class Dashboard extends Component {
 
         let display;
         if(this.state.active.name === "chat"){
-            display = <Chat user={this.state.user} activeChatId={this.state.active.id} />
+            display = <Chat user={this.state.user} activeChatId={this.state.active.id} role={this.state.role}/>
             
         }
         else if(this.state.active.name === "assignment"){
