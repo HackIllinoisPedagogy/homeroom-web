@@ -2,12 +2,14 @@ import React, {Component} from 'react';
 import ProblemInputCard from './CreateAssignment';
 import {addDocument, setDocument, updateDocument} from "../../services/firebase";
 import * as firebase from "firebase";
+import autosize from "autosize/dist/autosize";
 
 class CreateAssignment extends Component {
     constructor(props) {
         super(props);
         this.state = {
             assignmentName: "",
+            description: "",
             problems: [
                 {
                     question: '',
@@ -19,11 +21,17 @@ class CreateAssignment extends Component {
 
     }
 
+    componentDidMount() {
+        autosize(this.descriptionBox);
+    }
+
     setProblems = (problems) => this.setState({problems: problems});
 
     setName = (name) => {
         this.setState({assignmentName: name});
     }
+
+    setDescription = (description) => this.setState({description});
 
     addQuestion = () => {
         this.setState(prevState => ({
@@ -83,6 +91,7 @@ class CreateAssignment extends Component {
         });
         const docRef = await addDocument("assignments", {
             name: this.state.assignmentName,
+            description: this.state.description,
             problems: problems
         })
         await updateDocument("classes", this.props.currentClass.code + "", {
@@ -174,9 +183,22 @@ class CreateAssignment extends Component {
                     </span>
                     <div className="w-full max-w-sm">
                         <div className="md:w-2/3">
+                            <label>
+                                Title:
+                            </label>
                             <input
-                                className="bg-gray-200 appearance-none border-2 border-p-medium-gray rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-p-purple"
+                                className="bg-white appearance-none border border-gray-300 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-p-purple"
                                 type="text" value={this.state.assignmentName} placeholder="Assignment Name" onChange={e => this.setName(e.target.value)}/>
+                        </div>
+                    </div>
+                    <div className="w-full max-w-sm">
+                        <div className="md:w-2/3">
+                            <label>
+                                Description:
+                            </label>
+                            <textarea
+                                className="bg-white appearance-none border border-gray-300 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-p-purple h-auto"
+                                value={this.state.description} placeholder="Assignment Name" onChange={e => this.setDescription(e.target.value)} ref={r => this.descriptionBox = r}/>
                         </div>
                     </div>
                 </div>

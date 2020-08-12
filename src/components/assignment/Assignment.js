@@ -8,9 +8,12 @@ import {InlineMath, BlockMath} from 'react-katex';
 import {handleLatexRendering, generateRenderingArray} from './renderingUtils.js'
 import {addStyles, EditableMathField} from 'react-mathquill'
 import autosize from "autosize/dist/autosize";
-import {getDocument} from "../../services/firebase";
+import {addDocument, db, getDocument, setDocument, updateDocument} from "../../services/firebase";
+
+import * as firebase from "firebase";
 
 import _ from "lodash";
+import EquationEditor from "equation-editor-react/lib";
 
 addStyles()
 
@@ -26,13 +29,17 @@ class LatexField extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            latex: '\\text{Type your answer here...}',
+            input: 'Text here',
         }
     }
 
-    mathquillDidMount() {
-        this.EditableMathField.focus();
-        autosize(this.EditableMathField);
+    setInput = (input) => {
+        console.log(input);
+        this.setState({input: input});
+    }
+
+    componentDidMount() {
+        autosize(this.box);
     }
 
     handleSubmit(event) {
@@ -40,29 +47,32 @@ class LatexField extends React.Component {
         event.preventDefault();
     }
 
+
     render() {
         return (
-            <form onSubmit={this.handleSubmit}>
-                <label className="font-bold">Answer:<br/></label>
-                <div id="input-container" className="h-auto">
-                    <EditableMathField
-                        className="bg-transparent max-h-75 min-h-38 w-full"
-                        latex={this.state.latex} // latex value for the input field
-                        ref={c => (this.EditableMathField = c)}
-                        onChange={(mathField) => {
-                            // called everytime the input changes
-                            this.setState({latex: mathField.latex()})
-                        }}
-                    />
-                </div>
-
-                <br/>
-                <div id="button-container" className="w-full h-auto flex pt-1 justify-end">
-                    <input className="bg-custom-purple text-gray-100 w-1/5 shadow-md text-center h-8"
-                            type="submit" value="Submit"/>
-                </div>
-
-            </form>
+            <div className="w-64 h-32">
+                <EditableMathField
+                    className="bg-transparent max-h-75 min-h-32 w-32"
+                    latex={this.state.input} // latex value for the input field
+                    onChange={(mathField) => {
+                        // called everytime the input changes
+                        this.setState({input: mathField.latex()})
+                    }}
+                />
+            </div>
+            // <form onSubmit={this.handleSubmit}>
+            //     <label className="font-bold">Answer:<br/></label>
+            //
+            //
+            //
+            //
+            //     <br/>
+            //     <div id="button-container" className="w-full h-auto flex pt-1 justify-end">
+            //         <input className="bg-custom-purple text-gray-100 w-1/5 shadow-md text-center h-8"
+            //                type="submit" value="Submit"/>
+            //     </div>
+            //
+            // </form>
         )
     }
 }
@@ -73,9 +83,6 @@ class StudentForm extends React.Component {
         this.state = {
             value: 'Type in your answer here...'
         };
-
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentDidMount() {
@@ -83,25 +90,19 @@ class StudentForm extends React.Component {
         autosize(this.textarea);
     }
 
-    handleChange(event) {
-        this.setState({value: event.target.value});
-    }
-
-    handleSubmit(event) {
-        alert('Your answer was submitted: ' + this.state.value);
-        event.preventDefault();
-    }
 
     render() {
         return (
-            <form onSubmit={this.handleSubmit}>
+            <div>
                 <label className="font-bold">Answer:<br/></label>
                 <textarea className="bg-transparent max-h-75 min-h-38 w-full"
                           ref={c => (this.textarea = c)} placeholder={this.state.value} rows={2} defaultValue=""
-                          onChange={this.handleChange}/>
-                <br/><input className="bg-custom-purple text-gray-100 w-1/5 shadow-md text-center h-8 justify-end"
-                            type="submit" value="Submit"/>
-            </form>
+                          onChange={(e) => this.props.onChange(e.target.value)}/>
+                <br/>
+                <button className="bg-custom-purple text-gray-100 w-1/5 shadow-md text-center h-8 justify-end"
+                        onClick={this.props.onSubmit}>Submit
+                </button>
+            </div>
         );
     }
 }
@@ -130,6 +131,8 @@ class Assignment extends React.Component {
             curr_problem: 0,
             problemSet: null,
             listOpen: false,
+            answerSet: null,
+            submitted: false
         };
 
     }
@@ -141,22 +144,113 @@ class Assignment extends React.Component {
         });
     }
 
+    setAnswerSet(answerSet) {
+        this.setState({answerSet})
+    }
+
+    setAnswer(i, answer) {
+        let temp_answers = this.state.answerSet;
+        temp_answers[i] = answer;
+        this.setAnswerSet(temp_answers);
+    }
+
+    submitPressed = async () => {
+        const wrong = [];
+        const attemptRef = await db.collection(`assignments/${this.props.activeAssignmentId}/attempts`).doc(this.props.user.uid).get();
+
+        await updateDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
+            attempts: attemptRef.data().attempts + 1,
+        })
+
+        for (let i = 0; i < this.state.problemSet.problems.length; i++) {
+            const correct = this.state.problemSet.problems[i].answer;
+            if (correct !== this.state.answerSet[i]) {
+                wrong.push(i + 1);
+            }
+        }
+        if (wrong.length === 0) {
+            if (window.confirm("You are correct! Would you like to submit?")) {
+                const subRef = await addDocument("analytics", {
+                    assignmentId: this.props.activeAssignmentId,
+                    hasSubmitted: true,
+                    timeSubmitted: firebase.firestore.Timestamp.fromDate(new Date()),
+                    userId: this.props.user.uid
+                });
+                await addDocument(`analytics/${subRef.id}/problems`, {
+                    score: this.state.problemSet.problems.length,
+                    total: this.state.problemSet.problems.length,
+                    timeStarted: attemptRef.data().timeStarted,
+                    polyaCount: attemptRef.data().usedPolya
+                })
+                this.setState({submitted: true});
+                await updateDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
+                    submitted: true,
+                })
+            }
+        } else if(window.confirm(`You got the following problem(s) wrong: ${wrong}. Would you still like to submit?`)) {
+            const subRef = await addDocument("analytics", {
+                assignmentId: this.props.activeAssignmentId,
+                hasSubmitted: true,
+                timeSubmitted: firebase.firestore.Timestamp.fromDate(new Date()),
+                userId: this.props.user.uid
+            });
+            await addDocument(`analytics/${subRef.id}/problems`, {
+                score: this.state.problemSet.problems.length - wrong.length,
+                total: this.state.problemSet.problems.length,
+                timeStarted: attemptRef.data().timeStarted,
+                polyaCount: attemptRef.data().usedPolya
+            })
+            this.setState({submitted: true});
+            await updateDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
+                submitted: true,
+            })
+        }
+    }
+
     async componentDidMount() {
         if (this.props.activeAssignmentId) {
             const aRef = (await getDocument("assignments", this.props.activeAssignmentId + "")).data();
             this.setProblemSet(new ProblemSet(aRef.name, aRef.problems));
+            this.setAnswerSet(new Array(aRef.problems.length));
+            let attemptRef = await db.collection(`assignments/${this.props.activeAssignmentId}/attempts`).doc(this.props.user.uid).get();
+            if (!attemptRef.exists) {
+                this.setState({submitted: false});
+                await setDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
+                    attempts: 0,
+                    usedPolya: 0,
+                    timeStarted: firebase.firestore.Timestamp.fromDate(new Date()),
+                    submitted: false
+                });
+            } else if(attemptRef.data().submitted){
+                this.setState({submitted: true});
+            }
         }
     }
 
     async componentDidUpdate(prevProps, prevState, snapshot) {
         console.log("Update");
         let {activeAssignmentId} = prevProps;
-        if(this.props.activeAssignmentId !== activeAssignmentId) {
+        if (this.props.activeAssignmentId !== activeAssignmentId) {
             const aRef = (await getDocument("assignments", this.props.activeAssignmentId + "")).data();
             this.changeProblem(0);
             this.setProblemSet(aRef);
+            this.setAnswerSet(new Array(aRef.problems.length));
+            let attemptRef = await db.collection(`assignments/${this.props.activeAssignmentId}/attempts`).doc(this.props.user.uid).get();
+            if (!attemptRef.exists) {
+                this.setState({submitted: false});
+                await setDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
+                    attempts: 0,
+                    usedPolya: 0,
+                    timeStarted: firebase.firestore.Timestamp.fromDate(new Date()),
+                    submitted: false
+                });
+            } else {
+                this.setState({submitted: attemptRef.data().submitted});
+            }
         }
     }
+
+
 
     getProblems(id) {
         const problemSet = getProblemsById(id);
@@ -168,10 +262,22 @@ class Assignment extends React.Component {
     }
 
     render() {
+        if(this.state.submitted) {
+            return (
+                <div className="flex flex-col w-full justify-center" style={{height: `${window.innerHeight}px`}}>
+                    <span className="self-center text-6xl">
+                        You've already <span className="font-bold text-p-purple">submitted!</span>
+                    </span>
+                    <span className="self-center text-3xl">
+                        Select a different assignment
+                    </span>
+                </div>
+            )
+        }
 
         console.log("here");
         let prob = this.state.problemSet;
-        if(!prob) return <div/>;
+        if (!prob) return <div/>;
 
         const options = this.state.problemSet.problems.map((val, key) => {
             return <option value={`${key}`}>{key + 1}</option>;
@@ -204,14 +310,15 @@ class Assignment extends React.Component {
                             {renderingArray.map((el) => handleLatexRendering(el))}
                         </div>
                         <div id="response" className="px-16 py-10">
-                            <StudentForm/>
-                            <LatexField/>
+                            <StudentForm onChange={(str) => this.setAnswer(this.state.curr_problem, str)}
+                                         onSubmit={this.submitPressed}/>
+                            {/*<LatexField/>*/}
                         </div>
                     </div>
                     <div id="tutor-spacing" className="h-64 float-right w-2/5">
                     </div>
                     <div id="tutor-container" className="h-auto float-right w-2/5 flex justify-center">
-                        <Tutor problem={prob.problems[this.state.curr_problem]}/>
+                        <Tutor assignmentID={this.props.activeAssignmentId} user={this.props.user} problem={prob.problems[this.state.curr_problem]}/>
                     </div>
                 </div>
             </div>

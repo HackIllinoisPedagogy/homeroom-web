@@ -10,6 +10,7 @@
     "autoprefixer": "^9.8.6",
     "autosize": "^4.0.2",
     "axios": "^0.19.2",
+    "equation-editor-react": "0.0.6",
     "firebase": "^7.17.2",
     "lodash": "^4.17.19",
     "postcss": "^7.0.32",
@@ -21,8 +22,8 @@
     "react-katex": "^2.0.2",
     "react-mathquill": "^0.2.6",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.1",
-    "react-scroll": "^1.8.0",
+    "react-scripts": "^3.4.2",
+    "react-scroll": "^1.8.1",
     "reactjs-dropdown-component": "^1.1.2",
     "tailwindcss": "^1.6.2"
   },
