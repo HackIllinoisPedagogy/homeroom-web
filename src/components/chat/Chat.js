@@ -43,6 +43,17 @@ class Chat extends Component {
         return 0;
     }
 
+    compareReverse (a, b) {
+        if (a.createdOn > b.createdOn) {
+            return -1;
+        }
+        if (a.createdOn < b.createdOn) {
+            return 1;
+        }
+
+        return 0;
+    }
+
     // getNameFromMessageId = async (uid) => {
     //     const user = await getDocument('users', uid);
     //     if (user.exists) {
@@ -92,7 +103,7 @@ class Chat extends Component {
                 snapshot.forEach(doc => {
                     temp_announcements.push(doc.data());
                 })
-                temp_announcements.sort(this.compare);
+                temp_announcements.sort(this.compareReverse);
                 this.setState({announcements: temp_announcements});
             } else {
                 const temp_announcement = {
@@ -250,9 +261,9 @@ class Chat extends Component {
                     <div className="w-full flex flex-col justify-center items-center" style={{height: '50%'}}>
                         <p className="px-2 text-p-dark-blue font-bold mb-2 text-2xl text-left font-thin px-4 pt-3">Announcements</p>
                         <div
-                            className="w-10/12 justify-center shadow rounded-lg flex flex-col bg-white p-3 h-64 overflow-y-auto">
+                            className="w-10/12 justify-center rounded-lg flex flex-col bg-transparent p-3 h-64 overflow-y-auto">
 
-                            <div className="my-5 px-3" style={{'height': '100%'}}>
+                            <div className="my-5 px-3 flex flex-col items-center" style={{'height': '100%'}}>
                                 {this.state.announcements ? this.state.announcements.map(announcement => {
                                         if (announcement.placeholder) {
                                             return (
@@ -263,8 +274,9 @@ class Chat extends Component {
                                         }
                                         return (
                                             <div
-                                                className="bg-p-light-purple border-t border-b border-p-purple text-p-purple px-4 py-3 mb-3"
-                                                role="alert">
+                                                className="transition transition-shadow w-full duration-500
+                                                ease-in-out transform border rounded border-p-orange bg-white text-p-orange
+                                                px-4 py-3 mb-3 hover:shadow-md">
                                                 <p className="font-bold">{announcement.body}</p>
                                                 <p className="text-sm">Sent
                                                     by {announcement.sentByName} on {announcement.createdOn.toDate().toDateString()}</p>
