@@ -29,6 +29,7 @@ class LatexField extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            latex: '',
             input: 'Text here',
         }
     }
@@ -294,7 +295,8 @@ class Assignment extends React.Component {
                             <select name="probs" id="probs"
                                     className="block appearance-none w-full bg-white text-custom-purple font-bold border
 									border-custom-purple px-4 py-2 pr-8 rounded"
-                                    onChange={(event) => this.changeProblem(event.target.value)}>
+                                    onChange={(event) =>
+                                        this.changeProblem(event.target.value)}>
                                 {options}
                             </select>
                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2
