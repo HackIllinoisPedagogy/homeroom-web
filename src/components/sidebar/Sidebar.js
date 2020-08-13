@@ -420,8 +420,8 @@ class Sidebar extends Component {
                 <div class="flex w-full max-w-xs p-4 bg-white">
                     <ul class="flex flex-col w-full">
                         <li class="my-px">
-                            <a onClick={role === "teacher" ? this.createClass : this.addClass}
-                               class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 bg-gray-100">
+                            <a onClick={role === "teacher" ? this.createClass : this.addClass} id="plus-icon-container"
+                               class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 bg-gray-100 border-2 border-gray-300 cursor-pointer">
                                 <span class="flex items-center justify-center text-lg text-gray-400">
                                     <svg fill="none"
                                          stroke-linecap="round"
@@ -532,7 +532,7 @@ class Sidebar extends Component {
 
                         {role === "teacher" ? <li class="my-px">
                             <a onClick={() => this.props.setActive({name: 'create'})}
-                               class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple">
+                               class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple cursor-pointer">
                                 <span class="flex items-center justify-center text-lg text-p-purple">
                                     <svg fill="none"
                                          stroke-linecap="round"
@@ -544,7 +544,7 @@ class Sidebar extends Component {
                                         <path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </span>
-                                <span class="ml-3 ">Add new</span>
+                                <span class="ml-3">Add new</span>
                             </a>
                         </li> : <div></div>}
                         <li class="my-px">
@@ -556,7 +556,7 @@ class Sidebar extends Component {
 
                         {role === "teacher" ? <li class="my-px">
                             <a onClick={() => this.createGroupChats()}
-                               class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple">
+                               class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple cursor-pointer">
                                 <span class="flex items-center justify-center text-lg text-p-purple">
                                     <svg fill="none"
                                          stroke-linecap="round"
@@ -578,7 +578,7 @@ class Sidebar extends Component {
                                     this.props.history.push("/");
                                 })
                             }}
-                               class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-gray-100">
+                               class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-red-200 cursor-pointer">
                                 <span class="flex items-center justify-center text-lg text-red-400"
                                 >
                                     <svg fill="none"
