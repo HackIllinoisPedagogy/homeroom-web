@@ -19,8 +19,12 @@ function TeacherAssignment(props) {
     useEffect(() => {
         console.log(props.activeAssignmentId);
         updateAssignment();
-        getAnalyticsData();
     }, [props.activeAssignmentId]);
+
+    useEffect( () => {
+        generateProblemList();
+        getAnalyticsData();
+    }, [assignment])
 
     const generateProblemList = () => {
         if (!assignment) {
@@ -43,32 +47,43 @@ function TeacherAssignment(props) {
     const updateAssignment = async () => {
         const aRef = (await getDocument("assignments", props.activeAssignmentId)).data();
         setAssignment(aRef);
-        generateProblemList();
     }
 
-    const getAnalyticsData = () => {
+    const getAnalyticsData = async () => {
         const analyticsArray = [];
-        db.collection("analytics").where("assignmentId", "==", props.activeAssignmentId)
-            .get()
-            .then(function (querySnapshot) {
-                querySnapshot.forEach(function (doc) {
-                    // console.log(doc.id, " => ", doc.data());
-                    const problems = [];
-                    db.collection('analytics').doc(doc.id).collection('problems').get().then(problem => {
-                        problem.forEach(problemDoc => {
-                            problems.push(problemDoc.data())
-                        });
-
-                    });
-
-                    db.collection('users').doc(doc.data().userId).get().then(nameDoc => analyticsArray.push({ ...doc.data(), problems, name: nameDoc.data() }))
-
-                });
-                setAnalytics(analyticsArray);
-            })
-            .catch(function (error) {
-                console.log("Error getting documents: ", error);
+        // db.collection("analytics").where("assignmentId", "==", props.activeAssignmentId)
+        //     .get()
+        //     .then(function (querySnapshot) {
+        //         querySnapshot.forEach(function (doc) {
+        //             // console.log(doc.id, " => ", doc.data());
+        //             const problems = [];
+        //             db.collection('analytics').doc(doc.id).collection('problems').get().then(problem => {
+        //                 problem.forEach(problemDoc => {
+        //                     problems.push(problemDoc.data())
+        //                 });
+        //
+        //             });
+        //
+        //             db.collection('users').doc(doc.data().userId).get().then(nameDoc => analyticsArray.push({ ...doc.data(), problems, name: nameDoc.data() }))
+        //
+        //         });
+        //         setAnalytics(analyticsArray);
+        //     })
+        //     .catch(function (error) {
+        //         console.log("Error getting documents: ", error);
+        //     });
+        const collection = await db.collection("analytics").where("assignmentId", "==", props.activeAssignmentId).get();
+        for(let i = 0; i < collection.docs.length; i++) {
+            const doc = collection.docs[i];
+            const problems = [];
+            const problem = await db.collection("analytics").doc(doc.id).collection('problems').get();
+            problem.docs.forEach(problemDoc => {
+                problems.push(problemDoc.data());
             });
+            const nameDoc = await getDocument('users', doc.data().userId);
+            analyticsArray.push({...doc.data(), problems, name: nameDoc.data()});
+        }
+        setAnalytics(analyticsArray);
     }
 
     const updateGraphProblem = (item) => {
