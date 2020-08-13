@@ -4,6 +4,7 @@ import {addMessageToConversation, getMessagesFromConversation, getConversationsB
 import Message from './Message';
 import {db, getDocument} from '../../services/firebase';
 import {animateScroll} from "react-scroll";
+import * as firebase from "firebase";
 
 
 class Chat extends Component {
@@ -17,6 +18,7 @@ class Chat extends Component {
             chatInfo: null,
             currentUser: null,
             added: false,
+            announcements: null
         }
     }
 
@@ -35,6 +37,17 @@ class Chat extends Component {
             return -1;
         }
         if (a.createdOn > b.createdOn) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    compareReverse (a, b) {
+        if (a.createdOn > b.createdOn) {
+            return -1;
+        }
+        if (a.createdOn < b.createdOn) {
             return 1;
         }
 
@@ -84,6 +97,22 @@ class Chat extends Component {
                     console.log("err")
                 }
             });
+        db.collection("chats").doc(activeChatId).collection("announcements").onSnapshot(snapshot => {
+            const temp_announcements = [];
+            if (snapshot.size) {
+                snapshot.forEach(doc => {
+                    temp_announcements.push(doc.data());
+                })
+                temp_announcements.sort(this.compareReverse);
+                this.setState({announcements: temp_announcements});
+            } else {
+                const temp_announcement = {
+                    placeholder: true,
+                }
+                temp_announcements.push(temp_announcement);
+                this.setState({announcements: temp_announcements});
+            }
+        })
 
         await this.getConversationsById(activeChatId);
         if (this.state.chatInfo) {
@@ -92,14 +121,18 @@ class Chat extends Component {
 
     }
 
-
-    componentDidUpdate() {
-        console.log(this.state.messages);
-        this.scrollToBottom()
+    async componentDidUpdate(prevProps, prevState, snapshot) {
+        this.scrollToBottom();
+        if(prevProps.activeChatId !== this.props.activeChatId) {
+            this.setState({messages: null});
+            this.setState({members: null});
+            this.componentDidMount();
+        }
         if (this.state.chatInfo && !this.state.members) {
             this.getMembers();
         }
     }
+
 
     getMembers = async () => {
         const {activeChatId} = this.props;
@@ -131,8 +164,9 @@ class Chat extends Component {
         }
 
 
-        return this.state.messages.map(message => {
-            return <Message uid={uid} message={message}/>
+        return this.state.messages.map((message, index) => {
+            if(index === 0) return <Message uid={uid} message={message}/>
+            return <Message uid={uid} message={message} prev={this.state.messages[index - 1]}/>
         });
 
 
@@ -140,6 +174,7 @@ class Chat extends Component {
 
     addMessage = (e) => {
         e.preventDefault();
+        if(this.state.message === '') return;
         const {activeChatId, user} = this.props;
         const message = {
             body: this.state.message,
@@ -152,10 +187,30 @@ class Chat extends Component {
 
     }
 
+    sendAnnouncement = async (e) => {
+        e.preventDefault();
+        if(this.state.message === '') return;
+        const {activeChatId, user} = this.props;
+        const message = {
+            body: this.state.message,
+            sentById: user.uid,
+            sentByName: this.state.currentUser.name,
+            createdOn: firebase.firestore.Timestamp.fromDate(new Date()),
+        };
+        await db.collection('chats').doc(activeChatId).collection('announcements').add(message);
+        this.setState({message: ''});
+
+    }
+
     render() {
         const {activeChatId, user} = this.props;
         if (!activeChatId || !user || !this.state.chatInfo) {
             return <div>No Active chat or user</div>;
+        }
+        if(!this.state.members) {
+            return <div className="h-screen w-full flex items-center justify-center">
+                <div className="lds-dual-ring"/>
+            </div>
         }
         if (this.state.members) {
             console.log(this.state.members, this.state.members.length);
@@ -164,37 +219,22 @@ class Chat extends Component {
             this.setState({added: true});
         }
 
+        let sendAnnouncementDiv = <div/>;
+        if (this.props.role === "teacher") {
+            sendAnnouncementDiv =
+                <button
+                    className="ml-2 flex-shrink-0 bg-p-orange hover:bg-red-700 border-p-orange hover:border-red-700 text-sm border-4 text-white py-1 px-2 rounded"
+                    onClick={this.sendAnnouncement}
+                >
+                    Send as Announcement
+                </button>;
+        }
+
 
         return (
-            // <div>
-            //     <div class="flex mb-4 h-screen w-full">
-            //         <div class="mt-10  w-5/6 grid grid-rows-6 grid-flow-col gap-4">
-            //             <div class="row-span-1">
-            //                 <span className="text-3xl font-bold">
-            //                     {this.getConversationsById(activeChatId).name}
-            //                 </span>
-            //             </div>
-            //             <div class="row-span-4">
-            //                 {this.renderChatHistory()}
-            //             </div>
-            //             <div class="row-span-1 ">
-            //                 <form onSubmit={this.addMessage} class="absolute inset-x-10 bottom-10 w-4/12 mx-auto">
-            //                     <div style={{ borderColor: '#7754F8' }} class="flex items-center border-b border-teal-500 p-8 rounded shadow bg-white py-2">
-            //                         <input class="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none" type="text" placeholder="Send a message..." onChange={(e) => this.setState({ message: e.target.value })} />
-            //                         <button style={{ borderColor: '#7754F8', backgroundColor: '#7754F8' }} class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" type="submit">
-            //                             Send</button>
-            //                     </div>
-
-            //                 </form>
-            //             </div>
-            //             <div class="w-1/6 h-12"></div>
-            //         </div>
-
-            //     </div>
-            // </div>
             <div class="flex items-start inline">
                 <div class="w-4/6 flex flex-col h-screen ">
-                    <div class="border-b flex px-6 py-2 mb-10 items-center">
+                    <div class="border-b flex px-6 py-2 mb-10 items-center mt-3">
                         <div class="flex flex-col">
                             <span className="text-3xl font-bold">
                                 {this.state.chatInfo.name}
@@ -224,32 +264,68 @@ class Chat extends Component {
                                     type="submit">
                                 Send
                             </button>
+                            {sendAnnouncementDiv}
                         </div>
                     </form>
                 </div>
-                <div className="w-2/6 flex flex-col justify-center h-screen items-center">
-                    <p className="px-2 text-p-dark-blue font-bold mb-2 text-2xl text-left font-thin px-4 pt-3">Members</p>
-                    <div
-                        className="w-10/12 justify-center shadow rounded-lg flex flex-col bg-white p-3 h-64 overflow-y-auto">
+                <div className="w-2/6 flex-col flex justify-center items-center h-screen">
+                    <div className="w-full flex flex-col justify-center items-center" style={{height: '50%'}}>
+                        <p className="px-2 text-p-dark-blue font-bold mb-2 text-2xl text-left font-thin px-4 pt-3">Announcements</p>
+                        <div
+                            className="w-10/12 justify-center rounded-lg flex flex-col bg-transparent p-3 h-64 overflow-y-auto">
 
-                        <div className="my-5 px-3" style={{'height': '100%'}}>
-                            {this.state.members ? this.state.members.map(member => {
-                                console.log(member.name);
-                                return <div class="flex justify-between px-2 py-2">
-                                    <p class="flex text-gray-700">
-                                        <svg class="w-2 text-gray-500 mx-2" viewBox="0 0 8 8" fill="currentColor">
-                                            <circle cx="4" cy="4" r="3"/>
-                                        </svg>
-                                        {member.name}
-                                    </p>
-                                    <p class="text-gray-500 font-thin">{_.startCase(member.role)}</p>
-                                </div>
+                            <div className="my-5 px-3 flex flex-col items-center" style={{'height': '100%'}}>
+                                {this.state.announcements ? this.state.announcements.map(announcement => {
+                                        if (announcement.placeholder) {
+                                            return (
+                                                <div className="text-xl">
+                                                    There are no announcements for this chat
+                                                </div>
+                                            )
+                                        }
+                                        return (
+                                            <div
+                                                className="transition transition-shadow w-full duration-500
+                                                ease-in-out transform border rounded border-p-orange bg-white text-p-orange
+                                                px-4 py-3 mb-3 hover:shadow-md">
+                                                <p className="font-bold">{announcement.body}</p>
+                                                <p className="text-sm">Sent
+                                                    by {announcement.sentByName} on {announcement.createdOn.toDate().toDateString()}</p>
+                                            </div>
+                                        )
+                                    }) :
+                                    <div className="w-full h-full flex flex-col justify-center">
+                                        <div className="self-center lds-dual-ring"/>
+                                    </div>
+                                }
+                            </div>
 
-                            }) : <div className="w-full h-full flex flex-col justify-center">
-                                <div className="self-center lds-dual-ring"/>
-                            </div>}
                         </div>
+                    </div>
+                    <div className="w-full flex flex-col justify-center h-auto items-center" style={{height: '50%'}}>
+                        <p className="px-2 text-p-dark-blue font-bold mb-2 text-2xl text-left font-thin px-4 pt-3">Members</p>
+                        <div
+                            className="w-10/12 justify-center shadow rounded-lg flex flex-col bg-white p-3 h-64 overflow-y-auto">
 
+                            <div className="my-5 px-3" style={{'height': '100%'}}>
+                                {this.state.members ? this.state.members.map(member => {
+                                    console.log(member.name);
+                                    return <div class="flex justify-between px-2 py-2">
+                                        <p class="flex text-gray-700">
+                                            <svg class="w-2 text-gray-500 mx-2" viewBox="0 0 8 8" fill="currentColor">
+                                                <circle cx="4" cy="4" r="3"/>
+                                            </svg>
+                                            {member.name}
+                                        </p>
+                                        <p class="text-gray-500 font-thin">{_.startCase(member.role)}</p>
+                                    </div>
+
+                                }) : <div className="w-full h-full flex flex-col justify-center">
+                                    <div className="self-center lds-dual-ring"/>
+                                </div>}
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>

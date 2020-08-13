@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import {auth, db, getDocument} from "../services/firebase";
+import {auth, db, getDocument, addDocument, updateDocument} from "../services/firebase";
 import Assignment from "./assignment/Assignment";
 import CreateAssignment from './assignment/CreateAssignment';
 import Chat from './chat/Chat';
 import Sidebar from './sidebar/Sidebar';
 import TeacherAssignment from "./assignment/TeacherAssignment";
+import * as firebase from 'firebase';
 
 
 class Dashboard extends Component {
@@ -65,7 +66,7 @@ class Dashboard extends Component {
 
         let display;
         if(this.state.active.name === "chat"){
-            display = <Chat user={this.state.user} activeChatId={this.state.active.id} />
+            display = <Chat user={this.state.user} activeChatId={this.state.active.id} role={this.state.role}/>
             
         }
         else if(this.state.active.name === "assignment"){

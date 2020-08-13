@@ -5,6 +5,7 @@ import {InlineMath} from 'react-katex';
 import _ from "lodash";
 
 import {handleLatexRendering, generateRenderingArray} from './renderingUtils.js'
+import {getDocument, updateDocument} from "../../services/firebase";
 
 
 class Tutor extends React.Component {
@@ -50,7 +51,8 @@ class Tutor extends React.Component {
             });
     }
 
-    handleClick() {
+    async handleClick() {
+        this.props.onTutorClick();
         let data = {"state": document.getElementById("user-state").value};
 
         let query = Object.keys(data)

@@ -1,7 +1,15 @@
 import React, {Component} from 'react';
 import {slide as Menu} from 'react-burger-menu';
 import {getConversations, getAssignments} from '../messagingData';
-import {addDocument, auth, db, getDocument, setDocument, updateDocument} from '../../services/firebase';
+import {
+    addDocument,
+    auth,
+    db,
+    deleteCollection,
+    getDocument,
+    setDocument,
+    updateDocument
+} from '../../services/firebase';
 import * as firebase from "firebase";
 import ClassSelector from "./ClassSelector";
 import {findAllInRenderedTree} from "react-dom/test-utils";
@@ -215,6 +223,73 @@ class Sidebar extends Component {
         })
     }
 
+
+
+    async createGroupChats() {
+        const classDoc = await getDocument("classes", this.props.currentClass.code + "");
+        const studentCount = classDoc.data().members.length - 1;
+        let numGroups;
+        let groupSize = window.prompt("How many students per group? (minimum)");
+        if(groupSize) {
+            if(isNaN(groupSize)) {
+                alert("The input was not a number");
+                return;
+            } else {
+                if(groupSize > studentCount) {
+                    alert("Group size too large");
+                    return;
+                } else {
+                    numGroups = Math.floor(studentCount / groupSize);
+                }
+            }
+        } else {
+            return;
+        }
+        // Delete Existing Group Chats
+        for (let i = 0; i < classDoc.data().chats.length; i++) {
+            const chat = classDoc.data().chats[i];
+            await db.collection("chats").doc(chat).delete();
+            await deleteCollection(`chats/${chat}/messages`);
+            await deleteCollection(`chats/${chat}/announcements`);
+        }
+
+        //Randomize the student array
+        let randomizedStudents = classDoc.data().members;
+        randomizedStudents.shift();
+        this.shuffle(randomizedStudents);
+
+        //Make Groups
+        let groups = [];
+        for(let i = 0; i < numGroups; i++) {
+            const ref = await addDocument("chats", {
+                name: `Table Group ${i + 1}`,
+                members: [this.props.user.uid]
+            });
+            groups.push(ref.id);
+        }
+        await updateDocument("classes", this.props.currentClass.code + "", {
+            chats: groups
+        });
+
+        //Start grouping Students
+        for(let i = 0; i < studentCount; i++) {
+            const student = randomizedStudents[i];
+            const groupIndex = i % numGroups;
+            await  updateDocument("chats", groups[groupIndex], {
+                members: firebase.firestore.FieldValue.arrayUnion(student)
+            });
+        }
+
+
+
+        alert("New table groups have been made.")
+
+    }
+
+    shuffle(array) {
+        array.sort(() => Math.random() - 0.5);
+    }
+
     renderCreateClassModal() {
         return (
             <div class="z-40 fixed bottom-0 inset-x-0 px-4 pb-4 sm:inset-0 sm:flex sm:items-center sm:justify-center">
@@ -400,7 +475,7 @@ class Sidebar extends Component {
                         <a onClick={() => {
                             this.props.setActive({name: 'assignment', id});
                         }}
-                           class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
+                           className="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple cursor-pointer">
                             <span className="ml-3">{name}</span>
                         </a>
                     </li>);
@@ -414,7 +489,7 @@ class Sidebar extends Component {
                 return (
                     <li class="my-px" key={id}>
                         <a onClick={() => this.props.setActive({name: 'chat', id})}
-                           class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
+                           className="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple cursor-pointer">
                             <span className="ml-3">{name}</span>
                         </a>
                     </li>);
@@ -478,6 +553,24 @@ class Sidebar extends Component {
                         </li>
 
                         {chatList}
+
+                        {role === "teacher" ? <li class="my-px">
+                            <a onClick={() => this.createGroupChats()}
+                               class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple">
+                                <span class="flex items-center justify-center text-lg text-p-purple">
+                                    <svg fill="none"
+                                         stroke-linecap="round"
+                                         stroke-linejoin="round"
+                                         stroke-width="2"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor"
+                                         class="h-6 w-6">
+                                        <path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </span>
+                                <span class="ml-3 ">Create Table Groups</span>
+                            </a>
+                        </li> : <div></div>}
 
                         <li class="my-px">
                             <a onClick={() => {

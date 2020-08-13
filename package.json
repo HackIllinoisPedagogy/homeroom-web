@@ -12,6 +12,7 @@
     "autoprefixer": "^9.8.6",
     "autosize": "^4.0.2",
     "axios": "^0.19.2",
+    "equation-editor-react": "0.0.6",
     "firebase": "^7.17.2",
     "lodash": "^4.17.19",
     "moment": "^2.27.0",
