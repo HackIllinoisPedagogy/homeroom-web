@@ -234,7 +234,7 @@ class Chat extends Component {
         return (
             <div class="flex items-start inline">
                 <div class="w-4/6 flex flex-col h-screen ">
-                    <div class="border-b flex px-6 py-2 mb-10 items-center">
+                    <div class="border-b flex px-6 py-2 mb-10 items-center mt-3">
                         <div class="flex flex-col">
                             <span className="text-3xl font-bold">
                                 {this.state.chatInfo.name}

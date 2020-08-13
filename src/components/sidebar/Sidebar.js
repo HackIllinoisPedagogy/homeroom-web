@@ -475,7 +475,7 @@ class Sidebar extends Component {
                         <a onClick={() => {
                             this.props.setActive({name: 'assignment', id});
                         }}
-                           class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
+                           className="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple cursor-pointer">
                             <span className="ml-3">{name}</span>
                         </a>
                     </li>);
@@ -489,7 +489,7 @@ class Sidebar extends Component {
                 return (
                     <li class="my-px" key={id}>
                         <a onClick={() => this.props.setActive({name: 'chat', id})}
-                           class="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple">
+                           className="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple cursor-pointer">
                             <span className="ml-3">{name}</span>
                         </a>
                     </li>);
