@@ -18,9 +18,7 @@ function TeacherAssignment(props) {
 
     useEffect(() => {
         console.log(props.activeAssignmentId);
-        updateAssignment().then(() => {
-            generateProblemList();
-        });
+        updateAssignment();
         getAnalyticsData();
     }, [props.activeAssignmentId]);
 
@@ -45,6 +43,7 @@ function TeacherAssignment(props) {
     const updateAssignment = async () => {
         const aRef = (await getDocument("assignments", props.activeAssignmentId)).data();
         setAssignment(aRef);
+        generateProblemList();
     }
 
     const getAnalyticsData = () => {
