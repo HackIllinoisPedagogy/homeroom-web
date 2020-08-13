@@ -420,15 +420,16 @@ class Sidebar extends Component {
                     <ul class="flex flex-col w-full">
                         <li class="my-px">
                             <a onClick={role === "teacher" ? this.createClass : this.addClass} id="plus-icon-container"
-                               class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 bg-gray-100 border-2 border-gray-300 cursor-pointer">
-                                <span class="flex items-center justify-center text-lg text-gray-400">
+                               class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-400 bg-gray-100 border-2 border-gray-300 cursor-pointer hover:bg-green-100 hover:border-green-300 hover:text-green-300">
+                                <span class="flex items-center justify-center text-lg">
                                     <svg fill="none"
                                          stroke-linecap="round"
                                          stroke-linejoin="round"
                                          stroke-width="2"
                                          viewBox="0 0 24 24"
                                          stroke="currentColor"
-                                         class="h-6 w-6">
+                                         class="h-6 w-6"
+                                         id="plus-icon">
                                         <path
                                             d="M8 3.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H4a.5.5 0 0 1 0-1h3.5V4a.5.5 0 0 1 .5-.5z"/>
                                         <path d="M7.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0V8z"/>
