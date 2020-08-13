@@ -125,10 +125,11 @@ class Chat extends Component {
         this.scrollToBottom();
         if(prevProps.activeChatId !== this.props.activeChatId) {
             this.setState({messages: null});
-            await this.componentDidMount();
+            this.setState({members: null});
+            this.componentDidMount();
         }
         if (this.state.chatInfo && !this.state.members) {
-            await this.getMembers();
+            this.getMembers();
         }
     }
 
@@ -205,6 +206,11 @@ class Chat extends Component {
         const {activeChatId, user} = this.props;
         if (!activeChatId || !user || !this.state.chatInfo) {
             return <div>No Active chat or user</div>;
+        }
+        if(!this.state.members) {
+            return <div className="h-screen w-full flex items-center justify-center">
+                <div className="lds-dual-ring"/>
+            </div>
         }
         if (this.state.members) {
             console.log(this.state.members, this.state.members.length);
