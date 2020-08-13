@@ -37,7 +37,8 @@ class Sidebar extends Component {
         addClassModal: false,
         className: "",
         assignments: null,
-        chats: null
+        chats: null,
+        active: ""
 
     };
 
@@ -456,7 +457,8 @@ class Sidebar extends Component {
 
         const {role} = this.state.doc;
 
-        const {currentClass} = this.props;
+        const {currentClass, active} = this.props;
+        const activeId = active.id;
 
         if (!currentClass) {
             return <div>Loading...</div>
@@ -473,7 +475,10 @@ class Sidebar extends Component {
                         <a onClick={() => {
                             this.props.setActive({name: 'assignment', id});
                         }}
-                           className="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple cursor-pointer">
+                           
+                            className={activeId === id ? "flex flex-row items-center px-2 h-12 rounded-lg bg-p-light-purple text-p-purple hover:bg-p-light-purple hover:text-p-purple cursor-pointer"  : "flex flex-row text-gray-600 items-center px-2 h-12 rounded-lg hover:bg-p-light-purple hover:text-p-purple cursor-pointer" }
+                        
+                           >
                             <span className="ml-3">{name}</span>
                         </a>
                     </li>);
@@ -486,7 +491,7 @@ class Sidebar extends Component {
                 return (
                     <li class="my-px" key={id}>
                         <a onClick={() => this.props.setActive({name: 'chat', id})}
-                           className="flex flex-row items-center px-2 h-12 rounded-lg text-gray-600 hover:bg-p-light-purple hover:text-p-purple cursor-pointer">
+                            className={activeId === id ? "flex flex-row items-center px-2 h-12 rounded-lg bg-p-light-purple text-p-purple hover:bg-p-light-purple hover:text-p-purple cursor-pointer"  : "flex flex-row text-gray-600 items-center px-2 h-12 rounded-lg hover:bg-p-light-purple hover:text-p-purple cursor-pointer" }>
                             <span className="ml-3">{name}</span>
                         </a>
                     </li>);
