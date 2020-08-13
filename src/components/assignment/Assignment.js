@@ -13,6 +13,7 @@ import {addDocument, db, getDocument, setDocument, updateDocument} from "../../s
 import * as firebase from "firebase";
 
 import _ from "lodash";
+import Timer from "../../Timer";
 
 
 addStyles()
@@ -133,12 +134,19 @@ class Assignment extends React.Component {
             problemSet: null,
             listOpen: false,
             answerSet: null,
-            submitted: false
+            submitted: false,
         };
 
     }
 
+    timers = [];
+    polyaCounts = [];
+
     changeProblem(i) {
+        this.timers[this.state.curr_problem].end();
+        if(!this.timers[i].getStart()) {
+            this.timers[i].start();
+        }
         this.setState({
             //problems: this.state.problems,
             curr_problem: i,
@@ -163,6 +171,8 @@ class Assignment extends React.Component {
             attempts: attemptRef.data().attempts + 1,
         })
 
+
+
         for (let i = 0; i < this.state.problemSet.problems.length; i++) {
             const correct = this.state.problemSet.problems[i].answer;
             if (correct !== this.state.answerSet[i]) {
@@ -171,36 +181,50 @@ class Assignment extends React.Component {
         }
         if (wrong.length === 0) {
             if (window.confirm("You are correct! Would you like to submit?")) {
+                this.timers[this.state.curr_problem].end();
                 const subRef = await addDocument("analytics", {
                     assignmentId: this.props.activeAssignmentId,
                     hasSubmitted: true,
-                    timeSubmitted: firebase.firestore.Timestamp.fromDate(new Date()),
-                    userId: this.props.user.uid
+                    timeStarted: this.timers[0].getStart(),
+                    timeSubmitted: this.timers[this.state.curr_problem].getEnd(),
+                    userId: this.props.user.uid,
+                    attempts: attemptRef.data().attempts + 1,
                 });
-                await addDocument(`analytics/${subRef.id}/problems`, {
-                    score: this.state.problemSet.problems.length,
-                    total: this.state.problemSet.problems.length,
-                    timeStarted: attemptRef.data().timeStarted,
-                    polyaCount: attemptRef.data().usedPolya
-                })
+                for(let i = this.state.problemSet.problems.length - 1; i >= 0; i--) {
+                    await addDocument(`analytics/${subRef.id}/problems`, {
+                        answer: this.state.answerSet[i],
+                        isCorrect: true,
+                        timeStarted: this.timers[i].getStart(),
+                        timeEnded: this.timers[i].getEnd(),
+                        polyaCount: this.polyaCounts[i],
+                        index: i
+                    })
+                }
                 this.setState({submitted: true});
                 await updateDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
                     submitted: true,
                 })
             }
         } else if(window.confirm(`You got the following problem(s) wrong: ${wrong}. Would you still like to submit?`)) {
+            this.timers[this.state.curr_problem].end();
             const subRef = await addDocument("analytics", {
                 assignmentId: this.props.activeAssignmentId,
                 hasSubmitted: true,
-                timeSubmitted: firebase.firestore.Timestamp.fromDate(new Date()),
-                userId: this.props.user.uid
+                timeStarted: this.timers[0].getStart(),
+                timeSubmitted: this.timers[this.state.curr_problem].getEnd(),
+                userId: this.props.user.uid,
+                attempts: attemptRef.data().attempts + 1
             });
-            await addDocument(`analytics/${subRef.id}/problems`, {
-                score: this.state.problemSet.problems.length - wrong.length,
-                total: this.state.problemSet.problems.length,
-                timeStarted: attemptRef.data().timeStarted,
-                polyaCount: attemptRef.data().usedPolya
-            })
+            for(let i = this.state.problemSet.problems.length - 1; i >= 0; i--) {
+                await addDocument(`analytics/${subRef.id}/problems`, {
+                    answer: this.state.answerSet[i],
+                    isCorrect: !wrong.includes(i + 1),
+                    timeStarted: this.timers[i].getStart(),
+                    timeEnded: this.timers[i].getEnd(),
+                    polyaCount: this.polyaCounts[i],
+                    index: i
+                })
+            }
             this.setState({submitted: true});
             await updateDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
                 submitted: true,
@@ -214,12 +238,15 @@ class Assignment extends React.Component {
             this.setProblemSet(new ProblemSet(aRef.name, aRef.problems));
             this.setAnswerSet(new Array(aRef.problems.length));
             let attemptRef = await db.collection(`assignments/${this.props.activeAssignmentId}/attempts`).doc(this.props.user.uid).get();
+            for(let i = 0; i < aRef.problems.length; i++) {
+                this.polyaCounts.push(0);
+                this.timers.push(new Timer());
+            }
+            this.timers[0].start();
             if (!attemptRef.exists) {
                 this.setState({submitted: false});
                 await setDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
                     attempts: 0,
-                    usedPolya: 0,
-                    timeStarted: firebase.firestore.Timestamp.fromDate(new Date()),
                     submitted: false
                 });
             } else if(attemptRef.data().submitted){
@@ -237,6 +264,13 @@ class Assignment extends React.Component {
             this.setProblemSet(aRef);
             this.setAnswerSet(new Array(aRef.problems.length));
             let attemptRef = await db.collection(`assignments/${this.props.activeAssignmentId}/attempts`).doc(this.props.user.uid).get();
+            this.polyaCounts = [];
+            this.timers = [];
+            for(let i = 0; i < aRef.problems.length; i++) {
+                this.polyaCounts.push(0);
+                this.timers.push(new Timer());
+            }
+            this.timers[0].start();
             if (!attemptRef.exists) {
                 this.setState({submitted: false});
                 await setDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
@@ -262,6 +296,10 @@ class Assignment extends React.Component {
         this.setState({problemSet: p});
     }
 
+    onTutorClick() {
+        this.polyaCounts[this.state.curr_problem] += 1;
+        alert(this.polyaCounts[this.state.curr_problem]);
+    }
     render() {
         if(this.state.submitted) {
             return (
@@ -320,7 +358,7 @@ class Assignment extends React.Component {
                     <div id="tutor-spacing" className="h-64 float-right w-2/5">
                     </div>
                     <div id="tutor-container" className="h-auto float-right w-2/5 flex justify-center">
-                        <Tutor assignmentID={this.props.activeAssignmentId} user={this.props.user} problem={prob.problems[this.state.curr_problem]}/>
+                        <Tutor onTutorClick={() => this.onTutorClick()} assignmentID={this.props.activeAssignmentId} user={this.props.user} problem={prob.problems[this.state.curr_problem]}/>
                     </div>
                 </div>
             </div>

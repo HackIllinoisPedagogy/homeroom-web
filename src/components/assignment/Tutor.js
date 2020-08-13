@@ -18,13 +18,6 @@ class Tutor extends React.Component {
         this.serverUrl = "http://127.0.0.1:5000/";
     }
 
-    async onTutorClick() {
-        const docRef = (await getDocument(`assignments/${this.props.assignmentID}/attempts`, this.props.user.uid)).data();
-        await updateDocument(`assignments/${this.props.assignmentID}/attempts`, this.props.user.uid, {
-            usedPolya: docRef.usedPolya + 1,
-        })
-    }
-
     componentDidMount() {
         if (this.state.solution) {
             this.loadSolution(this.state.solution);
@@ -59,7 +52,7 @@ class Tutor extends React.Component {
     }
 
     async handleClick() {
-        await this.onTutorClick();
+        this.props.onTutorClick();
         let data = {"state": document.getElementById("user-state").value};
 
         let query = Object.keys(data)

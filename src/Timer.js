@@ -1,3 +1,5 @@
+import * as firebase from "firebase";
+
 class Timer {
     startTime;
     endTime;
@@ -15,8 +17,14 @@ class Timer {
     }
 
     start() {
-        this.startTime = firebase.firestore.Timestamp
+        this.startTime = firebase.firestore.Timestamp.fromDate(new Date());
+    }
+
+    end() {
+        this.endTime = firebase.firestore.Timestamp.fromDate(new Date());
     }
 
 
 }
+
+export default Timer;
