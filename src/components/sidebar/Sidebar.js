@@ -228,16 +228,24 @@ class Sidebar extends Component {
     async createGroupChats() {
         const classDoc = await getDocument("classes", this.props.currentClass.code + "");
         const studentCount = classDoc.data().members.length - 1;
-        let groupNumber = 0;
-        const groupCount = studentCount / 4;
-        const extra = studentCount % 4;
-
-        //Delete Existing Group Chats
-        // classDoc.data().chats.forEach(async chat => {
-        //     await db.collection("chats").doc(chat).delete();
-        //     await db.collection(`chats/${chat}/messages`).delete();
-        //     await db.collection(`chats/${chat}/announcements`).delete();
-        // })
+        let numGroups;
+        let groupSize = window.prompt("How many students per group? (minimum)");
+        if(groupSize) {
+            if(isNaN(groupSize)) {
+                alert("The input was not a number");
+                return;
+            } else {
+                if(groupSize > studentCount) {
+                    alert("Group size too large");
+                    return;
+                } else {
+                    numGroups = Math.floor(studentCount / groupSize);
+                }
+            }
+        } else {
+            return;
+        }
+        // Delete Existing Group Chats
         for (let i = 0; i < classDoc.data().chats.length; i++) {
             const chat = classDoc.data().chats[i];
             await db.collection("chats").doc(chat).delete();
@@ -250,28 +258,29 @@ class Sidebar extends Component {
         randomizedStudents.shift();
         this.shuffle(randomizedStudents);
 
-        //Start grouping Students
-        let groupId = (await addDocument('chats', {
-            members: [this.props.user.uid],
-            name: `Table Group ${groupNumber + 1}`
-        })).id;
-        await updateDocument("classes", this.props.currentClass.code + "", {chats: [groupId]});
-
-
-        for (let i = 0; i < randomizedStudents.length; i++) {
-            const student = randomizedStudents[i];
-            if (Math.floor(i / 4) > groupNumber) {
-                console.log("NEW GROUP, I: " + i);
-                groupId = (await addDocument('chats', {
-                    members: [this.props.user.uid],
-                    name: `Table Group ${groupNumber + 2}`
-                })).id;
-                await updateDocument("classes", this.props.currentClass.code + "", {chats: firebase.firestore.FieldValue.arrayUnion(groupId)});
-                groupNumber++;
-
-            }
-            await updateDocument("chats", groupId, {members: firebase.firestore.FieldValue.arrayUnion(student)});
+        //Make Groups
+        let groups = [];
+        for(let i = 0; i < numGroups; i++) {
+            const ref = await addDocument("chats", {
+                name: `Table Group ${i + 1}`,
+                members: [this.props.user.uid]
+            });
+            groups.push(ref.id);
         }
+        await updateDocument("classes", this.props.currentClass.code + "", {
+            chats: groups
+        });
+
+        //Start grouping Students
+        for(let i = 0; i < studentCount; i++) {
+            const student = randomizedStudents[i];
+            const groupIndex = i % numGroups;
+            await  updateDocument("chats", groups[groupIndex], {
+                members: firebase.firestore.FieldValue.arrayUnion(student)
+            });
+        }
+
+
 
         alert("New table groups have been made.")
 

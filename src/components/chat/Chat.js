@@ -121,11 +121,14 @@ class Chat extends Component {
 
     }
 
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        console.log(this.state.messages);
-        this.scrollToBottom()
+    async componentDidUpdate(prevProps, prevState, snapshot) {
+        this.scrollToBottom();
+        if(prevProps.activeChatId !== this.props.activeChatId) {
+            this.setState({messages: null});
+            await this.componentDidMount();
+        }
         if (this.state.chatInfo && !this.state.members) {
-            this.getMembers();
+            await this.getMembers();
         }
     }
 
@@ -170,6 +173,7 @@ class Chat extends Component {
 
     addMessage = (e) => {
         e.preventDefault();
+        if(this.state.message === '') return;
         const {activeChatId, user} = this.props;
         const message = {
             body: this.state.message,
@@ -184,6 +188,7 @@ class Chat extends Component {
 
     sendAnnouncement = async (e) => {
         e.preventDefault();
+        if(this.state.message === '') return;
         const {activeChatId, user} = this.props;
         const message = {
             body: this.state.message,
