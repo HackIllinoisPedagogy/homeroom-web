@@ -122,9 +122,7 @@ class Sidebar extends Component {
             return;
         }
 
-        console.log(this.props.currentClass.code);
         let classRef = await getDocument("classes", this.props.currentClass.code + "");
-        console.log(classRef.data());
 
         for (let assignmentId of classRef.data().assignments) {
             let assignmentRef = await db.collection("assignments").doc(assignmentId).get();
@@ -485,7 +483,6 @@ class Sidebar extends Component {
         if (this.state.chats && this.state.chats.length) {
             chatList = this.state.chats.map(chat => {
                 const {id, name} = chat;
-                console.log(chat);
                 return (
                     <li class="my-px" key={id}>
                         <a onClick={() => this.props.setActive({name: 'chat', id})}

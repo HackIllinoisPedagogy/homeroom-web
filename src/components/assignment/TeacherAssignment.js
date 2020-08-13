@@ -5,6 +5,7 @@ import Dropdown from "../custom/Dropdown";
 import { Chart } from "react-charts";
 import moment from 'moment';
 import { ResponsiveBar } from '@nivo/bar'
+import { assign } from "lodash";
 
 
 function TeacherAssignment(props) {
@@ -15,42 +16,29 @@ function TeacherAssignment(props) {
     const [problemList, setProblemList] = useState(null);
     const [currentGraphProblem, setCurrentGraphProblem] = useState(null);
 
-
     useEffect(() => {
+        console.log(props.activeAssignmentId);
         updateAssignment().then(() => {
-            generateProblemList()
-            console.log("Teacher Assignment refreshed");
-            getAnalyticsData();
+            generateProblemList();
         });
+        getAnalyticsData();
     }, [props.activeAssignmentId]);
 
-    const series = React.useMemo(
-        () => ({
-            type: "bar"
-        }),
-        []
-    );
-    const axes = React.useMemo(
-        () => [
-            { primary: true, type: "ordinal", position: "bottom" },
-            { position: "left", type: "linear", stacked: true }
-        ],
-        []
-    );
-
     const generateProblemList = () => {
-        if(!assignment){
+        if (!assignment) {
             console.log("JFNDKJSFJKSDKF")
             return [];
         }
 
         const list = []
 
+
         assignment.problems.forEach((problem, i) => {
-            list.push({label: `Problem ${i+1}`, value: i});
+            list.push({ label: `Problem ${i + 1}`, value: i });
         })
 
         setProblemList(list);
+        // alert("helo");
         setCurrentGraphProblem(list[0]);
     }
 
@@ -59,7 +47,7 @@ function TeacherAssignment(props) {
         setAssignment(aRef);
     }
 
-    const getAnalyticsData = async () => {
+    const getAnalyticsData = () => {
         const analyticsArray = [];
         db.collection("analytics").where("assignmentId", "==", props.activeAssignmentId)
             .get()
@@ -84,7 +72,7 @@ function TeacherAssignment(props) {
             });
     }
 
-    const updateGraphProblem = (item) => {  
+    const updateGraphProblem = (item) => {
         setCurrentGraphProblem(item);
     }
 
@@ -137,10 +125,8 @@ function TeacherAssignment(props) {
     }
 
     const getTimeDiff = (date1, date2) => {
-        console.log(date1, date2);
         let dif = (date2 - date1);
-        console.log(dif);
-        dif = Math.round(dif / 60);
+        dif = dif / 60;
         return dif;
     }
 
@@ -153,7 +139,8 @@ function TeacherAssignment(props) {
         const graphData = [];
 
         analytics.forEach(submission => {
-            const { timeStarted, timeEnded } = submission.problems[problemIndex];
+
+            const { timeStarted, timeEnded } = submission.problems.filter(obj => obj.index == problemIndex)[0];
             const mins = getTimeDiff(timeStarted.seconds, timeEnded.seconds);
             graphData.push({ 'Student': submission.name.name, 'Time': mins });
         });
@@ -214,10 +201,9 @@ function TeacherAssignment(props) {
     }
 
 
-    useEffect(() => {
-        console.log("hook");
-        if (document.getElementById("assignmentInfo")) setHeight(window.innerHeight - document.getElementById("assignmentInfo").clientHeight);
-    }, [window.innerHeight, document.getElementById("assignmentInfo")]);
+    // useEffect(() => {
+    //     if (document.getElementById("assignmentInfo")) setHeight(window.innerHeight - document.getElementById("assignmentInfo").clientHeight);
+    // }, [window.innerHeight, document.getElementById("assignmentInfo")]);
 
     if (!assignment) {
         return (
@@ -227,8 +213,6 @@ function TeacherAssignment(props) {
             </div>
         )
     }
-
-    console.log(getTimeData(0));
 
     const MyResponsiveBar = (data) => (
         <ResponsiveBar
