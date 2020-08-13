@@ -215,6 +215,46 @@ class Sidebar extends Component {
         })
     }
 
+    async createGroupChats() {
+        const classDoc = await getDocument("classes", this.props.currentClass.code + "");
+        const studentCount = classDoc.data().members.length;
+        let groupNumber = 0;
+        const groupCount = studentCount / 4;
+        const extra = studentCount % 4;
+
+        //Delete Existing Group Chats
+        classDoc.data().chats.forEach(async chat => {
+            await db.collection("chats").doc(chat).delete();
+            await db.collection(`chats/${chat}/messages`).delete();
+            await db.collection(`chats/${chat}/announcements`).delete();
+        })
+
+        //Randomize the student array
+        const randomizedStudents = this.shuffle(classDoc.data().members);
+
+        //Start grouping Students
+        let groupId = (await addDocument('chats', {members: [this.props.user.uid]})).id;
+        await updateDocument("classes", this.props.currentClass.code, {chats: [groupId]});
+        
+
+        randomizedStudents.array.forEach(async (student, index) => {
+            if(index / 4 > groupNumber){
+                groupId = (await addDocument('chats', {members: [this.props.user.uid], name: `Table Group ${groupNumber + 2}`})).id;
+                await updateDocument("classes", this.props.currentClass.code, {chats: firebase.firestore.FieldValue.arrayUnion(groupId)});
+                groupNumber++;
+                
+            }
+            await updateDocument("chats", groupId, {members: firebase.firestore.FieldValue.arrayUnion(student)});
+        });
+
+        alert("New table groups have been made.")
+
+    }
+
+    shuffle(array) {
+        array.sort(() => Math.random() - 0.5);
+    }
+
     renderCreateClassModal() {
         return (
             <div class="z-40 fixed bottom-0 inset-x-0 px-4 pb-4 sm:inset-0 sm:flex sm:items-center sm:justify-center">
@@ -478,6 +518,24 @@ class Sidebar extends Component {
                         </li>
 
                         {chatList}
+
+                        {role === "teacher" ? <li class="my-px">
+                            <a onClick={this.createGroupChats}
+                               class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple">
+                                <span class="flex items-center justify-center text-lg text-p-purple">
+                                    <svg fill="none"
+                                         stroke-linecap="round"
+                                         stroke-linejoin="round"
+                                         stroke-width="2"
+                                         viewBox="0 0 24 24"
+                                         stroke="currentColor"
+                                         class="h-6 w-6">
+                                        <path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </span>
+                                <span class="ml-3 ">Create Table Groups</span>
+                            </a>
+                        </li> : <div></div>}
 
                         <li class="my-px">
                             <a onClick={() => {

@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import {auth, db, getDocument} from "../services/firebase";
+import {auth, db, getDocument, addDocument, updateDocument} from "../services/firebase";
 import Assignment from "./assignment/Assignment";
 import CreateAssignment from './assignment/CreateAssignment';
 import Chat from './chat/Chat';
 import Sidebar from './sidebar/Sidebar';
 import TeacherAssignment from "./assignment/TeacherAssignment";
+import * as firebase from 'firebase';
 
 
 class Dashboard extends Component {

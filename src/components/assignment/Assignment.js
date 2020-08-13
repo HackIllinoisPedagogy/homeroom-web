@@ -13,7 +13,7 @@ import {addDocument, db, getDocument, setDocument, updateDocument} from "../../s
 import * as firebase from "firebase";
 
 import _ from "lodash";
-import EquationEditor from "equation-editor-react/lib";
+
 
 addStyles()
 
