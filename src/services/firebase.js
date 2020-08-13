@@ -33,6 +33,29 @@ export const updateDocument = (c, d, obj) => {
     return db.collection(c).doc(d).update(obj);
 }
 
+export const deleteCollection = async (c) => {
+    const snapshot = await db.collection(c).get();
+
+    const batchSize = snapshot.size;
+    if (batchSize === 0) {
+        // When there are no documents left, we are done
+        return;
+    }
+
+    // Delete documents in a batch
+    const batch = db.batch();
+    snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+    });
+    await batch.commit();
+
+    // Recurse on the next process tick, to avoid
+    // exploding the stack.
+    process.nextTick(() => {
+        deleteCollection(c);
+    });
+}
+
 
 export const auth = firebase.auth();
 export const db = firebase.firestore();

@@ -1,7 +1,15 @@
 import React, {Component} from 'react';
 import {slide as Menu} from 'react-burger-menu';
 import {getConversations, getAssignments} from '../messagingData';
-import {addDocument, auth, db, getDocument, setDocument, updateDocument} from '../../services/firebase';
+import {
+    addDocument,
+    auth,
+    db,
+    deleteCollection,
+    getDocument,
+    setDocument,
+    updateDocument
+} from '../../services/firebase';
 import * as firebase from "firebase";
 import ClassSelector from "./ClassSelector";
 import {findAllInRenderedTree} from "react-dom/test-utils";
@@ -215,37 +223,55 @@ class Sidebar extends Component {
         })
     }
 
+
+
     async createGroupChats() {
         const classDoc = await getDocument("classes", this.props.currentClass.code + "");
-        const studentCount = classDoc.data().members.length;
+        const studentCount = classDoc.data().members.length - 1;
         let groupNumber = 0;
         const groupCount = studentCount / 4;
         const extra = studentCount % 4;
 
         //Delete Existing Group Chats
-        classDoc.data().chats.forEach(async chat => {
+        // classDoc.data().chats.forEach(async chat => {
+        //     await db.collection("chats").doc(chat).delete();
+        //     await db.collection(`chats/${chat}/messages`).delete();
+        //     await db.collection(`chats/${chat}/announcements`).delete();
+        // })
+        for (let i = 0; i < classDoc.data().chats.length; i++) {
+            const chat = classDoc.data().chats[i];
             await db.collection("chats").doc(chat).delete();
-            await db.collection(`chats/${chat}/messages`).delete();
-            await db.collection(`chats/${chat}/announcements`).delete();
-        })
+            await deleteCollection(`chats/${chat}/messages`);
+            await deleteCollection(`chats/${chat}/announcements`);
+        }
 
         //Randomize the student array
-        const randomizedStudents = this.shuffle(classDoc.data().members);
+        let randomizedStudents = classDoc.data().members;
+        randomizedStudents.shift();
+        this.shuffle(randomizedStudents);
 
         //Start grouping Students
-        let groupId = (await addDocument('chats', {members: [this.props.user.uid]})).id;
-        await updateDocument("classes", this.props.currentClass.code, {chats: [groupId]});
-        
+        let groupId = (await addDocument('chats', {
+            members: [this.props.user.uid],
+            name: `Table Group ${groupNumber + 1}`
+        })).id;
+        await updateDocument("classes", this.props.currentClass.code + "", {chats: [groupId]});
 
-        randomizedStudents.array.forEach(async (student, index) => {
-            if(index / 4 > groupNumber){
-                groupId = (await addDocument('chats', {members: [this.props.user.uid], name: `Table Group ${groupNumber + 2}`})).id;
-                await updateDocument("classes", this.props.currentClass.code, {chats: firebase.firestore.FieldValue.arrayUnion(groupId)});
+
+        for (let i = 0; i < randomizedStudents.length; i++) {
+            const student = randomizedStudents[i];
+            if (Math.floor(i / 4) > groupNumber) {
+                console.log("NEW GROUP, I: " + i);
+                groupId = (await addDocument('chats', {
+                    members: [this.props.user.uid],
+                    name: `Table Group ${groupNumber + 2}`
+                })).id;
+                await updateDocument("classes", this.props.currentClass.code + "", {chats: firebase.firestore.FieldValue.arrayUnion(groupId)});
                 groupNumber++;
-                
+
             }
             await updateDocument("chats", groupId, {members: firebase.firestore.FieldValue.arrayUnion(student)});
-        });
+        }
 
         alert("New table groups have been made.")
 
@@ -520,7 +546,7 @@ class Sidebar extends Component {
                         {chatList}
 
                         {role === "teacher" ? <li class="my-px">
-                            <a onClick={this.createGroupChats}
+                            <a onClick={() => this.createGroupChats()}
                                class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple">
                                 <span class="flex items-center justify-center text-lg text-p-purple">
                                     <svg fill="none"
