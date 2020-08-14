@@ -18,7 +18,8 @@ class Chat extends Component {
             chatInfo: null,
             currentUser: null,
             added: false,
-            announcements: null
+            announcements: null,
+            active_tab: 0
         }
     }
 
@@ -160,7 +161,7 @@ class Chat extends Component {
         const {activeChatId, user: {uid}} = this.props;
 
         if (!this.state.messages) {
-            return <div>No messages</div>
+            return <div className="pl-6">No messages</div>
         }
 
 
@@ -200,6 +201,98 @@ class Chat extends Component {
         await db.collection('chats').doc(activeChatId).collection('announcements').add(message);
         this.setState({message: ''});
 
+    }
+
+    announcementDiv(announcement) {
+        if (announcement.placeholder) {
+            return (
+                <div className="text-base">
+                    There are no announcements for this chat.
+                </div>
+            )
+        }
+
+        return (
+            <div class="bg-white p-3 mx-3 my-2 h-auto">
+                <div class="items-center h-auto">
+                    <div class="h-auto">
+                        <h2 class="text-base font-semibold text-gray-800">{announcement.body}</h2>
+                        <p class="text-gray-500">Sent
+                            by {announcement.sentByName} on {announcement.createdOn.toDate().toDateString()}.</p>
+                    </div>
+                </div>
+            </div>);
+    }
+
+    renderAnnouncements() {
+        return (
+            <div className="w-full flex flex-col justify-center items-center" style={{height: '100%'}}>
+                <div
+                className="w-full justify-center rounded-lg flex flex-col bg-transparent p-3 h-full overflow-y-auto">
+
+                    <div className="my-5 px-3 flex flex-col" style={{'height': '100%'}}>
+                        {this.state.announcements ? this.state.announcements.map(announcement => this.announcementDiv(announcement)) :
+                            <div className="w-full h-full flex flex-col justify-center">
+                                <div className="self-center lds-dual-ring"/>
+                            </div>
+                        }
+                    </div>
+
+                </div>
+            </div>);
+    }
+
+    renderMembers() {
+        return (
+            <div className="w-full flex flex-col justify-center h-auto items-center" style={{height: '100%'}}>
+                <div
+                    className="w-full justify-center shadow rounded-lg flex flex-col bg-white p-3 h-full overflow-y-auto">
+
+                    <div className="my-5 px-3" style={{'height': '100%'}}>
+                        {this.state.members ? this.state.members.map(member => {
+                            console.log(member.name);
+                            return <div class="flex justify-between px-2 py-2">
+                                <p class="flex text-gray-700">
+                                    <svg class="w-2 text-gray-500 mx-2" viewBox="0 0 8 8" fill="currentColor">
+                                        <circle cx="4" cy="4" r="3"/>
+                                    </svg>
+                                    {member.name}
+                                </p>
+                                <p class="text-gray-500 font-thin">{_.startCase(member.role)}</p>
+                            </div>
+
+                        }) : <div className="w-full h-full flex flex-col justify-center">
+                            <div className="self-center lds-dual-ring"/>
+                        </div>}
+                    </div>
+
+                </div>
+            </div>);
+    }
+
+    switchActive(i) {
+        this.setState({active_tab: i});
+    }
+
+    renderSwitchButtons() {
+        if (this.state.active_tab == 0) {
+            return (
+                <div id="switcher" className="announcement-member-container justify-start h-auto">
+                    <div className="announcement-member-container h-auto w-auto mb-5 float-left switcher-active-tab justify-center" onClick={() => this.switchActive(0)}>
+                        Announcements
+                        <div className="h-1 w-10 bg-custom-purple mt-1"></div>
+                    </div>
+                    <div className="announcement-member-container h-auto w-auto mb-5 float-left ml-8 switcher-inactive-tab" onClick={() => this.switchActive(1)}>Members</div>
+                </div>);
+        }
+        return (
+            <div id="switcher" className="announcement-member-container justify-start h-auto">
+                <div className="announcement-member-container h-auto w-auto mb-5 float-left switcher-inactive-tab" onClick={() => this.switchActive(0)}>Announcements</div>
+                <div className="announcement-member-container h-auto w-auto mb-5 float-left ml-8 switcher-active-tab" onClick={() => this.switchActive(1)}>
+                    Members
+                    <div className="h-1 w-10 bg-custom-purple mt-1"></div>
+                </div>
+            </div>);
     }
 
     render() {
@@ -268,64 +361,10 @@ class Chat extends Component {
                         </div>
                     </form>
                 </div>
-                <div className="w-2/6 flex-col flex justify-center items-center h-screen">
-                    <div className="w-full flex flex-col justify-center items-center" style={{height: '50%'}}>
-                        <p className="px-2 text-p-dark-blue font-bold mb-2 text-2xl text-left font-thin px-4 pt-3">Announcements</p>
-                        <div
-                            className="w-10/12 justify-center rounded-lg flex flex-col bg-transparent p-3 h-64 overflow-y-auto">
-
-                            <div className="my-5 px-3 flex flex-col items-center" style={{'height': '100%'}}>
-                                {this.state.announcements ? this.state.announcements.map(announcement => {
-                                        if (announcement.placeholder) {
-                                            return (
-                                                <div className="text-xl">
-                                                    There are no announcements for this chat
-                                                </div>
-                                            )
-                                        }
-                                        return (
-                                            <div
-                                                className="transition transition-shadow w-full duration-500
-                                                ease-in-out transform border rounded border-p-orange bg-white text-p-orange
-                                                px-4 py-3 mb-3 hover:shadow-md">
-                                                <p className="font-bold">{announcement.body}</p>
-                                                <p className="text-sm">Sent
-                                                    by {announcement.sentByName} on {announcement.createdOn.toDate().toDateString()}</p>
-                                            </div>
-                                        )
-                                    }) :
-                                    <div className="w-full h-full flex flex-col justify-center">
-                                        <div className="self-center lds-dual-ring"/>
-                                    </div>
-                                }
-                            </div>
-
-                        </div>
-                    </div>
-                    <div className="w-full flex flex-col justify-center h-auto items-center" style={{height: '50%'}}>
-                        <p className="px-2 text-p-dark-blue font-bold mb-2 text-2xl text-left font-thin px-4 pt-3">Members</p>
-                        <div
-                            className="w-10/12 justify-center shadow rounded-lg flex flex-col bg-white p-3 h-64 overflow-y-auto">
-
-                            <div className="my-5 px-3" style={{'height': '100%'}}>
-                                {this.state.members ? this.state.members.map(member => {
-                                    console.log(member.name);
-                                    return <div class="flex justify-between px-2 py-2">
-                                        <p class="flex text-gray-700">
-                                            <svg class="w-2 text-gray-500 mx-2" viewBox="0 0 8 8" fill="currentColor">
-                                                <circle cx="4" cy="4" r="3"/>
-                                            </svg>
-                                            {member.name}
-                                        </p>
-                                        <p class="text-gray-500 font-thin">{_.startCase(member.role)}</p>
-                                    </div>
-
-                                }) : <div className="w-full h-full flex flex-col justify-center">
-                                    <div className="self-center lds-dual-ring"/>
-                                </div>}
-                            </div>
-
-                        </div>
+                <div className="w-2/6 flex-col flex justify-center items-center h-screen rounded-lg">
+                    {this.renderSwitchButtons()}
+                    <div className="bg-white rounded shadow-md announcement-member-container">
+                    {(this.state.active_tab == 0 ? this.renderAnnouncements() : this.renderMembers())}
                     </div>
                 </div>
             </div>
