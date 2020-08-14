@@ -5,6 +5,8 @@ import Dropdown from "../custom/Dropdown";
 import { Chart } from "react-charts";
 import moment from 'moment';
 import { ResponsiveBar } from '@nivo/bar'
+import { assign } from "lodash";
+import { getAssignments } from "../messagingData";
 
 
 function TeacherAssignment(props) {
@@ -15,42 +17,31 @@ function TeacherAssignment(props) {
     const [problemList, setProblemList] = useState(null);
     const [currentGraphProblem, setCurrentGraphProblem] = useState(null);
 
-
     useEffect(() => {
-        updateAssignment().then(() => {
-            generateProblemList()
-            console.log("Teacher Assignment refreshed");
-            getAnalyticsData();
-        });
+        console.log(props.activeAssignmentId);
+        updateAssignment();
     }, [props.activeAssignmentId]);
 
-    const series = React.useMemo(
-        () => ({
-            type: "bar"
-        }),
-        []
-    );
-    const axes = React.useMemo(
-        () => [
-            { primary: true, type: "ordinal", position: "bottom" },
-            { position: "left", type: "linear", stacked: true }
-        ],
-        []
-    );
+    useEffect(() => {
+        generateProblemList();
+        getAnalyticsData();
+    }, [assignment])
 
     const generateProblemList = () => {
-        if(!assignment){
+        if (!assignment) {
             console.log("JFNDKJSFJKSDKF")
             return [];
         }
 
         const list = []
 
+
         assignment.problems.forEach((problem, i) => {
-            list.push({label: `Problem ${i+1}`, value: i});
+            list.push({ label: `Problem ${i + 1}`, value: i });
         })
 
         setProblemList(list);
+        // alert("helo");
         setCurrentGraphProblem(list[0]);
     }
 
@@ -61,30 +52,42 @@ function TeacherAssignment(props) {
 
     const getAnalyticsData = async () => {
         const analyticsArray = [];
-        db.collection("analytics").where("assignmentId", "==", props.activeAssignmentId)
-            .get()
-            .then(function (querySnapshot) {
-                querySnapshot.forEach(function (doc) {
-                    // console.log(doc.id, " => ", doc.data());
-                    const problems = [];
-                    db.collection('analytics').doc(doc.id).collection('problems').get().then(problem => {
-                        problem.forEach(problemDoc => {
-                            problems.push(problemDoc.data())
-                        });
-
-                    });
-
-                    db.collection('users').doc(doc.data().userId).get().then(nameDoc => analyticsArray.push({ ...doc.data(), problems, name: nameDoc.data() }))
-
-                });
-                setAnalytics(analyticsArray);
-            })
-            .catch(function (error) {
-                console.log("Error getting documents: ", error);
+        // db.collection("analytics").where("assignmentId", "==", props.activeAssignmentId)
+        //     .get()
+        //     .then(function (querySnapshot) {
+        //         querySnapshot.forEach(function (doc) {
+        //             // console.log(doc.id, " => ", doc.data());
+        //             const problems = [];
+        //             db.collection('analytics').doc(doc.id).collection('problems').get().then(problem => {
+        //                 problem.forEach(problemDoc => {
+        //                     problems.push(problemDoc.data())
+        //                 });
+        //
+        //             });
+        //
+        //             db.collection('users').doc(doc.data().userId).get().then(nameDoc => analyticsArray.push({ ...doc.data(), problems, name: nameDoc.data() }))
+        //
+        //         });
+        //         setAnalytics(analyticsArray);
+        //     })
+        //     .catch(function (error) {
+        //         console.log("Error getting documents: ", error);
+        //     });
+        const collection = await db.collection("analytics").where("assignmentId", "==", props.activeAssignmentId).get();
+        for (let i = 0; i < collection.docs.length; i++) {
+            const doc = collection.docs[i];
+            const problems = [];
+            const problem = await db.collection("analytics").doc(doc.id).collection('problems').get();
+            problem.docs.forEach(problemDoc => {
+                problems.push(problemDoc.data());
             });
+            const nameDoc = await getDocument('users', doc.data().userId);
+            analyticsArray.push({ ...doc.data(), problems, name: nameDoc.data() });
+        }
+        setAnalytics(analyticsArray);
     }
 
-    const updateGraphProblem = (item) => {  
+    const updateGraphProblem = (item) => {
         setCurrentGraphProblem(item);
     }
 
@@ -137,11 +140,23 @@ function TeacherAssignment(props) {
     }
 
     const getTimeDiff = (date1, date2) => {
-        console.log(date1, date2);
         let dif = (date2 - date1);
-        console.log(dif);
-        dif = Math.round(dif / 60);
-        return dif;
+        dif = dif / 60;
+        return Math.ceil(dif);
+    }
+
+    const getAverageAssignmentTime = () => {
+        if (!analytics.length) {
+            return "";
+        }
+
+        let totalTime = 0;
+        analytics.forEach(submission => {
+            const mins = getTimeDiff(submission.timeStarted.seconds, submission.timeSubmitted.seconds);
+            totalTime += mins;
+        })
+
+        return (Math.ceil(totalTime / analytics.length));
     }
 
 
@@ -153,7 +168,8 @@ function TeacherAssignment(props) {
         const graphData = [];
 
         analytics.forEach(submission => {
-            const { timeStarted, timeEnded } = submission.problems[problemIndex];
+
+            const { timeStarted, timeEnded } = submission.problems.filter(obj => obj.index == problemIndex)[0];
             const mins = getTimeDiff(timeStarted.seconds, timeEnded.seconds);
             graphData.push({ 'Student': submission.name.name, 'Time': mins });
         });
@@ -194,30 +210,29 @@ function TeacherAssignment(props) {
 
 
     let completedDiv =
-        <span className="text-gray-400" onClick={() => setCompleted(true)}>
+        <span className="text-gray-400 py-2" onClick={() => setCompleted(true)}>
             Completed
         </span>;
     let notCompletedDiv =
-        <span className="text-gray-400" onClick={() => setCompleted(false)}>
+        <span className="text-gray-400 py-2" onClick={() => setCompleted(false)}>
             Not Completed
         </span>;
     if (completed) {
         completedDiv =
-            <span className="border-b border-p-purple" onClick={() => setCompleted(true)}>
+            <span className="border-b-2 rounded-md text-p-dark-blue border-p-purple py-2" onClick={() => setCompleted(true)}>
                 Completed
             </span>;
     } else {
         notCompletedDiv =
-            <span className="border-b border-p-purple" onClick={() => setCompleted(false)}>
+            <span className="border-b-2 rounded-md text-p-dark-blue border-p-purple py-2" onClick={() => setCompleted(false)}>
                 Not Completed
             </span>;
     }
 
 
-    useEffect(() => {
-        console.log("hook");
-        if (document.getElementById("assignmentInfo")) setHeight(window.innerHeight - document.getElementById("assignmentInfo").clientHeight);
-    }, [window.innerHeight, document.getElementById("assignmentInfo")]);
+    // useEffect(() => {
+    //     if (document.getElementById("assignmentInfo")) setHeight(window.innerHeight - document.getElementById("assignmentInfo").clientHeight);
+    // }, [window.innerHeight, document.getElementById("assignmentInfo")]);
 
     if (!assignment) {
         return (
@@ -227,8 +242,6 @@ function TeacherAssignment(props) {
             </div>
         )
     }
-
-    console.log(getTimeData(0));
 
     const MyResponsiveBar = (data) => (
         <ResponsiveBar
@@ -309,78 +322,109 @@ function TeacherAssignment(props) {
         />
     )
 
+    const timeConvert = (num) => {
+        var hours = Math.floor(num / 60);
+        var mins = num % 60;
+        if(hours > 0){
+            if(mins > 0){
+                return hours + " hrs" + mins + " mins";
+            }
+            return hours + " hrs";
+        }
+
+        return mins + " mins";
+        
+    }
 
 
+    console.log(currentGraphProblem);
     return (
         <div className="flex flex-col">
-            <div id="assignmentInfo" className="flex flex-col px-32 pt-16">
+            <div id="assignmentInfo" className="flex flex-col pt-16">
                 <span className="text-3xl font-bold">
                     {assignment.name}
                 </span>
-                <div className="h-1 w-3/5 bg-gray-300 mt-3" />
-                <div className="flex w-3/4 justify-between my-16">
-                    <div className="flex flex-col">
-                        <span className="self-center">
-                            Average Score
-                    </span>
-                        <span className="text-6xl self-center   ">
+                <div className="h-1 w-3/5 bg-gray-300" />
+                <div className="flex w-10/12 mt-8 mb-10">
+                    <div className="flex flex-col mr-16">
+
+                        <span className="text-6xl text-p-dark-blue self-center   ">
                             {analytics ? getAverageScore() + "%" : "none"}
                         </span>
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="self-center">
-                            Students Who Used Polya
+                        <span className="self-center text-gray-600">
+                            Average Score
                     </span>
-                        <span className="text-6xl self-center   ">
+                    </div>
+                    <div className="flex flex-col mr-16">
+                        <span className="text-6xl self-center  text-p-dark-blue ">
                             {analytics ? getPolyaUse() + "%" : ""}
                         </span>
+                        <span className="self-center text-gray-600">
+                            Students Who Used Polya
+                    </span>
                     </div>
-                    <div className="flex flex-col">
-                        <span className="self-center">
-                            Average Attempts
+                    <div className="flex flex-col mr-16">
+                        <span className="text-6xl self-center w-full text-p-dark-blue ">
+                            {analytics ? timeConvert(getAverageAssignmentTime()) : ""}
+                        </span>
+                        <span className="self-center text-gray-600">
+                            Average Time
                     </span>
-                        <span className="text-6xl self-center   ">
-                            82%
-                    </span>
+
                     </div>
                 </div>
 
-                <div>
-                    <span className="text-p-dark-blue w-1/4">
+                <div className="flex">
+                    <span className="text-p-dark-blue mr-4 text-2xl">
                         Time Taken on
                     </span>
                     <Dropdown list={problemList} action={updateGraphProblem} value={currentGraphProblem} />
 
                 </div>
-                <div style={{ height: '300px' }} className="flex flex-column justify-between w-full bg-white shadow-md mt-8 rounded-lg pb-4 mb-8 pt-4 px-3">
+                <div style={{ height: '300px' }} className="flex flex-column justify-between w-4/5 bg-white shadow-sm mt-8 rounded-lg pb-4 mb-8 pt-4 px-3">
                     {/* <Chart style={{ height: '300px', margin: '20px' }} data={getTimeData(0)} series={series} axes={axes} tooltip /> */}
-                    {getTimeData(0) ? MyResponsiveBar(getTimeData(0)) : <div></div>}
+                    {currentGraphProblem && getTimeData(currentGraphProblem.value) ? MyResponsiveBar(getTimeData(currentGraphProblem.value)) : <div></div>}
                 </div>
 
                 <div className="flex justify-between w-1/4">
                     {completedDiv}
                     {notCompletedDiv}
                 </div>
-                <div className="flex justify-between w-full mt-8 pb-5 px-3">
-                    <span className="text-gray-400 w-1/4">
+                <div className="flex justify-between w-10/12 mt-8 pb-5 px-4">
+                    <span className="text-gray-400 w-1/5">
                         Name
                     </span>
-                    <span className="text-gray-400 w-1/4">
+                    <span className="text-gray-400 w-1/5">
                         Submitted On
                     </span>
-                    <span className="text-gray-400 w-1/4">
+                    <span className="text-gray-400 w-1/5">
+                        Polya Uses
+                    </span>
+                    <span className="text-gray-400 w-1/5">
                         Score
                     </span>
-                    <span className="text-gray-400 w-1/4">
-                        Polya Uses
+
+                    <span className="text-gray-400 w-1/5">
+                        Percentage
                     </span>
 
                 </div>
-                <div className="flex flex-col mx-32" style={{ 'height': `${height}px` }}>
+                <div className="flex flex-col w-10/12 mb-16 text-p-dark-blue" style={{ 'height': `auto` }}>
 
-                    {analytics ? analytics.map(student => {
-                        return <SubmissionCard name={student.name.name} date={moment(Date(student.timeSubmitted)).format('MM/DD/YYYY')} score={getIndividualScore(student.userId, true)} percent={getIndividualPolyaUses(student.userId)} />
-                    }) : <div></div>}
+                    {
+                        analytics ? analytics.map(student => {
+                            console.log(student);
+
+                            if (completed && student.hasSubmitted) {
+                                return <SubmissionCard name={student.name.name} date={moment(Date(student.timeSubmitted)).format('MM/DD/YYYY')} score={getIndividualScore(student.userId, true)} percent={Math.ceil(getIndividualScore(student.userId) * 100)} polya={getIndividualPolyaUses(student.userId)} />
+                            }
+
+                            if (!completed && !student.hasSubmitted) {
+                                return <SubmissionCard name={student.name.name} score={getIndividualScore(student.userId, true)} percent={Math.ceil(getIndividualScore(student.userId) * 100)} polya={getIndividualPolyaUses(student.userId)} />
+                            }
+
+                        }) : <div></div>}
+
                 </div>
             </div>
         </div>

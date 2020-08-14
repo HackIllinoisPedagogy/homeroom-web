@@ -140,7 +140,26 @@ Note: Beware of modifying this element as it can break the animations - you shou
   float: right;
 }
 
-#messages-div ::-webkit-scrollbar {display:none;}
+#messages-div ::-webkit-scrollbar {
+  display:none;
+}
+
+::-webkit-scrollbar-track
+{
+  background-color: #F4F8FB;
+}
+
+::-webkit-scrollbar
+{
+    width: 0.4rem;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb
+{
+    background-color: #d9d9d9;
+    border-radius: 0.2rem;
+}
 
 .bg-custom-purple {
   background-color: #7754F8;
@@ -154,12 +173,12 @@ Note: Beware of modifying this element as it can break the animations - you shou
   color: #7754F8;
 }
 
-
 .lds-dual-ring {
   display: inline-block;
   width: 80px;
   height: 80px;
 }
+
 .lds-dual-ring:after {
   content: " ";
   display: block;
@@ -171,6 +190,7 @@ Note: Beware of modifying this element as it can break the animations - you shou
   border-color: #7754F8 transparent #7754F8 transparent;
   animation: lds-dual-ring 1.2s linear infinite;
 }
+
 @keyframes lds-dual-ring {
   0% {
     transform: rotate(0deg);
@@ -180,4 +200,19 @@ Note: Beware of modifying this element as it can break the animations - you shou
   }
 }
 
+.position-sent-avatar {
+  position: absolute;
+  top: 1.35rem;
+  right: 0.55rem;
+}
 
+.position-received-avatar {
+  position: absolute;
+  top: 1.35rem;
+  left: 0.55rem;
+}
+
+#plus-icon-container {
+  padding-left: 1.3rem;
+  padding-top: 0.5rem;
+}

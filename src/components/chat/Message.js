@@ -39,7 +39,7 @@ const Message = (props) => {
         if(!samePerson) {
             avatar = (
                 <div
-                    className="absolute top-0 right-0 w-10 bg-p-light-purple text-p-purple mx-auto flex-shrink-0 flex items-center justify-center rounded-full  sm:mx-0 sm:h-10 sm:w-10">
+                    className="position-sent-avatar w-8 bg-p-light-purple text-p-purple mx-auto flex-shrink-0 flex items-center justify-center rounded-full  sm:mx-0 sm:h-8 sm:w-8">
                     {getInitialsFromName(sentByName)}
                 </div>
             );
@@ -66,7 +66,7 @@ const Message = (props) => {
         if(!samePerson) {
             avatar = (
                 <div
-                    className="absolute top-0 left-5 w-10 bg-p-light-purple text-p-purple mx-auto flex-shrink-0 flex items-center justify-center rounded-full  sm:mx-0 sm:h-10 sm:w-10">
+                    className="position-received-avatar w-8 bg-p-light-purple text-p-purple mx-auto flex-shrink-0 flex items-center justify-center rounded-full  sm:mx-0 sm:h-8 sm:w-8">
                     {getInitialsFromName(sentByName)}
                 </div>
             );
