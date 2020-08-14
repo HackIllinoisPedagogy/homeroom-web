@@ -134,10 +134,9 @@ class Assignment extends React.Component {
             answerSet: null,
             submitted: false,
             submitModal: false,
-<<<<<<< HEAD
+
             description: null,
-=======
->>>>>>> 72864e8465c6316f80708d62100fa0a31e86a684
+
         };
 
     }
@@ -288,10 +287,9 @@ class Assignment extends React.Component {
             const aRef = (await getDocument("assignments", this.props.activeAssignmentId + "")).data();
             this.setProblemSet(new ProblemSet(aRef.name, aRef.problems));
             this.setAnswerSet(new Array(aRef.problems.length));
-<<<<<<< HEAD
+
             this.setState({description: aRef.description});
-=======
->>>>>>> 72864e8465c6316f80708d62100fa0a31e86a684
+
             let attemptRef = await db.collection(`assignments/${this.props.activeAssignmentId}/attempts`).doc(this.props.user.uid).get();
             for (let i = 0; i < aRef.problems.length; i++) {
                 this.polyaCounts.push(0);
