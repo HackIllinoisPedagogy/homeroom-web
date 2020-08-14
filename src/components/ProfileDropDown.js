@@ -22,7 +22,9 @@ function ProfileDropDown(props) {
         for (let i = 0; i < docRefs.length; i++) {
             let docRef = docRefs[i];
             if(classAssignments.includes(docRef.data().assignmentId)) {
-                totalTime += docRef.data().timeSubmitted.toDate().getMinutes() - docRef.data().timeStarted.toDate().getMinutes();
+                const diffMs = docRef.data().timeSubmitted.toDate() - docRef.data().timeStarted.toDate();
+                const diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+                totalTime += diffMins;
                 const problemsRefs = (await getCollection(`analytics/${docRef.id}/problems`)).docs;
                 totalPossible += problemsRefs.length;
                 for (let j = 0; j < problemsRefs.length; j++) {
