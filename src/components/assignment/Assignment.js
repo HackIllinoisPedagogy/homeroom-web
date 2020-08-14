@@ -421,16 +421,13 @@ class Assignment extends React.Component {
             );
         }
 
-
         return (
             <div id="page">
                 {this.renderSubmitModal()}
                 <div id="content" className="">
                     <div id="pset-title" className="px-16 py-20 w-3/5 float-left">
                         <h3 className="text-black font-bold text-4xl"> {prob.name} </h3>
-
                         {description}
-
                         <div id="dropdown" className="py-6 inline-block relative w-15">
                             <select name="probs" id="probs"
                                 className="block appearance-none w-full bg-white text-custom-purple font-bold border
