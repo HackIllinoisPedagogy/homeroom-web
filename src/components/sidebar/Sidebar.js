@@ -540,7 +540,7 @@ class Sidebar extends Component {
 
         return (
             <div style={{ width: '300px' }}
-                class="fixed  overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
+                class="fixed  overflow-y-auto shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
                 <div class="flex max-w-xs p-4 bg-white">
                     <ul class="flex flex-col">
                         <div class="mb-6">

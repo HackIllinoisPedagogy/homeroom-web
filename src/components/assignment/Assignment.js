@@ -261,7 +261,7 @@ class Assignment extends React.Component {
                     className="absolute left-0 top-0 bg-black-t-50 w-full h-screen flex justify-center items-center z-50">
                     <div
                         className="w-auto h-auto border-p-purple bg-white rounded flex p-5 flex-col justify-center justify-center items-center">
-                        <span className="text-3xl">
+                        <span className="text-3xl font-bold">
                             {modalTopText}
                         </span>
                         <span className="text-xl mt-5">
