@@ -227,3 +227,19 @@ Note: Beware of modifying this element as it can break the animations - you shou
   padding-left: 1.3rem;
   padding-top: 0.5rem;
 }
+
+.announcement-member-container {
+    height: 50%;
+    width: 350px;
+}
+
+.switcher-active-tab {
+    cursor: pointer;
+    color: #000000;
+    font-weight: 600;
+}
+
+.switcher-inactive-tab {
+    cursor: pointer;
+    color: #a0aec0;
+}
