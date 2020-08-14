@@ -134,7 +134,10 @@ class Assignment extends React.Component {
             answerSet: null,
             submitted: false,
             submitModal: false,
+<<<<<<< HEAD
             description: null,
+=======
+>>>>>>> 72864e8465c6316f80708d62100fa0a31e86a684
         };
 
     }
@@ -285,7 +288,10 @@ class Assignment extends React.Component {
             const aRef = (await getDocument("assignments", this.props.activeAssignmentId + "")).data();
             this.setProblemSet(new ProblemSet(aRef.name, aRef.problems));
             this.setAnswerSet(new Array(aRef.problems.length));
+<<<<<<< HEAD
             this.setState({description: aRef.description});
+=======
+>>>>>>> 72864e8465c6316f80708d62100fa0a31e86a684
             let attemptRef = await db.collection(`assignments/${this.props.activeAssignmentId}/attempts`).doc(this.props.user.uid).get();
             for (let i = 0; i < aRef.problems.length; i++) {
                 this.polyaCounts.push(0);
@@ -407,6 +413,7 @@ class Assignment extends React.Component {
 
         let renderingArray = generateRenderingArray(prob.problems[this.state.curr_problem].question);
 
+<<<<<<< HEAD
         let description = "";
 
         if(this.state.description) {
@@ -417,13 +424,18 @@ class Assignment extends React.Component {
             );
         }
 
+=======
+>>>>>>> 72864e8465c6316f80708d62100fa0a31e86a684
         return (
             <div id="page">
                 {this.renderSubmitModal()}
                 <div id="content" className="">
                     <div id="pset-title" className="px-16 py-20 w-3/5 float-left">
                         <h3 className="text-black font-bold text-4xl"> {prob.name} </h3>
+<<<<<<< HEAD
                         {description}
+=======
+>>>>>>> 72864e8465c6316f80708d62100fa0a31e86a684
                         <div id="dropdown" className="py-6 inline-block relative w-15">
                             <select name="probs" id="probs"
                                 className="block appearance-none w-full bg-white text-custom-purple font-bold border
