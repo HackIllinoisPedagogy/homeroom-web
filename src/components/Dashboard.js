@@ -6,6 +6,7 @@ import Chat from './chat/Chat';
 import Sidebar from './sidebar/Sidebar';
 import TeacherAssignment from "./assignment/TeacherAssignment";
 import * as firebase from 'firebase';
+import Home from "./assignment/Home";
 
 
 class Dashboard extends Component {
@@ -79,11 +80,13 @@ class Dashboard extends Component {
         else if(this.state.active.name === "create"){
             display = <CreateAssignment user={this.state.user} currentClass={this.state.currentClass}/>
             
+        }else if(this.state.active.name === "home"){
+            display = <Home user={this.state.user}/>
         }
         // add for All Class once Firebase is in
 
         return (
-            <div class="overflow-y-auto">
+            <div className="overflow-y-auto">
                 <Sidebar user={this.state.user} numStudents={this.state.numStudents} active={this.state.active} setActive={this.setActive} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
                 <div id="dashboard-inner-container">
                     {display}
