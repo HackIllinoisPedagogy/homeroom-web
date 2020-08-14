@@ -99,7 +99,7 @@ class Dashboard extends Component {
         return (
             <div className="overflow-y-auto">
                 {profile}
-                <Sidebar setShowProfile={this.setShowProfile}role={this.state.role} user={this.state.user} numStudents={this.state.numStudents} active={this.state.active} setActive={this.setActive} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
+                <Sidebar setShowProfile={this.setShowProfile} role={this.state.role} user={this.state.user} numStudents={this.state.numStudents} active={this.state.active} setActive={this.setActive} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
                 <div id="dashboard-inner-container">
                     {display}
                 </div>

@@ -161,6 +161,7 @@ class Sidebar extends Component {
 
     getChats = async () => {
         let toReturn = [];
+        let otherChats = [];
 
         if (!this.props.currentClass) {
             return;
@@ -168,13 +169,14 @@ class Sidebar extends Component {
 
         let classRef = await getDocument("classes", this.props.currentClass.code + "");
         let allChatRef = await getDocument("chats", classRef.data().allChat + "");
+
         toReturn.push({
             ...allChatRef.data(),
             id: classRef.data().allChat
         })
         for (let chatId of classRef.data().chats) {
             let chatRef = await db.collection("chats").doc(chatId).get();
-            toReturn.push({ ...chatRef.data(), id: chatId });
+            if(chatRef.data().members.includes(this.props.user.uid)) toReturn.push({ ...chatRef.data(), id: chatId });
         }
 
         return toReturn;
