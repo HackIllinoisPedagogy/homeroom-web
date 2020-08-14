@@ -60,7 +60,7 @@ const Dropdown = (props) => {
                 <div ref={popoverDropdownRef}
                     className={
                         (dropdownPopoverShow ? "block " : "hidden ") +
-                        "origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white z-10"
+                        "origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white z-40"
                     }>
                     <div class="rounded-md bg-white shadow-xs">
                         <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">

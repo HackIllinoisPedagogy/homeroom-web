@@ -136,6 +136,17 @@ Note: Beware of modifying this element as it can break the animations - you shou
   float: left;
 }
 
+.tooltip .tooltip-text {
+  visibility: hidden;
+  text-align: center;
+  padding: 2px 6px;
+  position: absolute;
+  z-index: 50;
+}
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+}
+
 #message-sent {
   float: right;
 }
