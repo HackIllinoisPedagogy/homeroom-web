@@ -36,7 +36,7 @@ function LogIn(props) {
     }
 
     return (
-        <div style={{
+        <div className="bg-white" style={{
             'height': window.innerHeight + "px",
         }}
             onKeyDown={(event) => {
@@ -49,36 +49,37 @@ function LogIn(props) {
                 }
             }}
         >
-            <div className="flex w-full justify-center flex p-3"
+            <div className="absolute flex content-center w-full justify-center z-40 p-3"
                 style={{
                     'height': '10%'
                 }}
             >
                 <Logo width={50} height={50} />
-                <span className="ml-4 text-4xl font-bold">
-                    Pedagogy
+                <span className=" ml-4 text-2xl py-4 font-bold ">
+                    Homeroom
                 </span>
             </div>
-            <div className="w-full justify-center flex flex-col  p-3" style={{ 'height': '90%', }}>
-                <span className="w-1/3 self-center font-bold text-3xl text-center mb-10">
+            <div className="w-full justify-center flex flex-col p-3" style={{ 'height': '100%', }}>
+    
+                <span className="w-1/3 self-center font-bold text-3xl text-center mb-8">
                     Welcome back!
                 </span>
                 <form className="w-1/3 self-center">
-                    <div className="flex items-center border-b border-p-purple py-2">
+                    <div className="flex items-center py-2">
                         <input
-                            className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
+                            class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-p-purple"
                             type="email" placeholder="Email" aria-label="email" value={email}
                             onChange={event => setEmail(event.target.value)} />
                     </div>
-                    <div className="flex items-center border-b border-p-purple py-2">
+                    <div className="flex items-center py">
                         <input
-                            className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
+                            class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white focus:border-p-purple"
                             type="password" placeholder="Password" aria-label="password" value={password}
                             onChange={event => setPassword(event.target.value)} />
                     </div>
                 </form>
                 <button
-                    className="self-center w-1/3 rounded bg-p-purple hover:bg-purple-700 border-p-purple hover:border-purple-700 mt-3 py-1 px-2 border-4 text-sm text-white hover:shadow-inner"
+                    className="self-center w-1/3 rounded bg-p-purple hover:bg-purple-700 border-p-purple hover:border-purple-700 mt-3 py-2 px-2 border-4 text-sm text-white hover:shadow-inner"
                     onClick={() => {
                         auth.signInWithEmailAndPassword(email, password).then(() => {
                             props.history.push("/dashboard");
@@ -91,7 +92,7 @@ function LogIn(props) {
                     Log In
                 </button>
                 <button
-                    className="my-3 self-center w-1/3 rounded bg-p-orange hover:bg-orange-700 border-p-orange hover:border-orange-700 py-1 px-2 border-4 text-sm text-white hover:shadow-inner"
+                    className="my-3 self-center w-1/3 rounded bg-p-orange hover:bg-orange-700 border-p-orange hover:border-orange-700 py-2 px-2 border-4 text-sm text-white hover:shadow-inner"
                     onClick={() => {
                         props.history.push("/signup");
                     }}
