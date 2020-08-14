@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {slide as Menu} from 'react-burger-menu';
-import {getConversations, getAssignments} from '../messagingData';
+import React, { Component } from 'react';
+import { slide as Menu } from 'react-burger-menu';
+import { getConversations, getAssignments } from '../messagingData';
 import {
     addDocument,
     auth,
@@ -12,8 +12,10 @@ import {
 } from '../../services/firebase';
 import * as firebase from "firebase";
 import ClassSelector from "./ClassSelector";
-import {findAllInRenderedTree} from "react-dom/test-utils";
+import { findAllInRenderedTree } from "react-dom/test-utils";
 import _ from "lodash";
+import Logo from "../Logo";
+import Dropdown from '../custom/Dropdown';
 
 // const assignments = [
 //     { name: 'Problem Set #1' },
@@ -26,6 +28,29 @@ import _ from "lodash";
 //     { name: 'All Class Conversation' },
 //     { name: 'Table Group 6' }
 // ]
+
+const classesPictureOptions = [
+    {
+        label: "Yellow",
+        file: 'yellow.svg'
+    },
+    {
+        label: "Orange",
+        file: 'orange.svg'
+    },
+    {
+        label: "Purple",
+        file: 'purple.svg'
+    },
+    {
+        label: "Pink",
+        file: 'pink.svg'
+    },
+    {
+        label: "Magenta",
+        file: 'magenta.svg'
+    },
+]
 
 
 class Sidebar extends Component {
@@ -43,21 +68,21 @@ class Sidebar extends Component {
     };
 
     setAssignments(assignments) {
-        this.setState({assignments});
+        this.setState({ assignments });
     }
 
     setChats(chats) {
-        this.setState({chats});
+        this.setState({ chats });
     }
 
     setClassName(name) {
-        this.setState({className: name});
+        this.setState({ className: name });
     }
 
     async componentDidMount() {
 
         const setUser = (user) => {
-            this.setState({user});
+            this.setState({ user });
         }
 
         auth.onAuthStateChanged(function (user) {
@@ -85,7 +110,7 @@ class Sidebar extends Component {
                 console.log("no doc");
             }
 
-            this.setState({doc: doc.data()})
+            this.setState({ doc: doc.data() })
 
         }
 
@@ -104,11 +129,11 @@ class Sidebar extends Component {
     }
 
     createClass = () => {
-        this.setState({createClassModal: true})
+        this.setState({ createClassModal: true })
     }
 
     addClass = () => {
-        this.setState({addClassModal: true})
+        this.setState({ addClassModal: true })
     }
 
     map_func = async (id) => {
@@ -127,7 +152,7 @@ class Sidebar extends Component {
 
         for (let assignmentId of classRef.data().assignments) {
             let assignmentRef = await db.collection("assignments").doc(assignmentId).get();
-            toReturn.push({...assignmentRef.data(), id: assignmentId});
+            toReturn.push({ ...assignmentRef.data(), id: assignmentId });
         }
 
 
@@ -149,7 +174,7 @@ class Sidebar extends Component {
         })
         for (let chatId of classRef.data().chats) {
             let chatRef = await db.collection("chats").doc(chatId).get();
-            toReturn.push({...chatRef.data(), id: chatId});
+            toReturn.push({ ...chatRef.data(), id: chatId });
         }
 
         return toReturn;
@@ -229,15 +254,15 @@ class Sidebar extends Component {
         const studentCount = classDoc.data().members.length - 1;
         let numGroups;
         let groupSize = window.prompt("How many students per group? (minimum)");
-        if(groupSize) {
-            if(isNaN(groupSize)) {
+        if (groupSize) {
+            if (isNaN(groupSize)) {
                 alert("The input was not a number");
                 return;
             } else {
-                if(groupSize > studentCount) {
+                if (groupSize > studentCount) {
                     alert("Group size too large");
                     return;
-                } else if(groupSize <= 0) {
+                } else if (groupSize <= 0) {
                     alert("Please enter a positive group size");
                     return;
                 } else {
@@ -262,7 +287,7 @@ class Sidebar extends Component {
 
         //Make Groups
         let groups = [];
-        for(let i = 0; i < numGroups; i++) {
+        for (let i = 0; i < numGroups; i++) {
             const ref = await addDocument("chats", {
                 name: `Table Group ${i + 1}`,
                 members: [this.props.user.uid]
@@ -274,10 +299,10 @@ class Sidebar extends Component {
         });
 
         //Start grouping Students
-        for(let i = 0; i < studentCount; i++) {
+        for (let i = 0; i < studentCount; i++) {
             const student = randomizedStudents[i];
             const groupIndex = i % numGroups;
-            await  updateDocument("chats", groups[groupIndex], {
+            await updateDocument("chats", groups[groupIndex], {
                 members: firebase.firestore.FieldValue.arrayUnion(student)
             });
         }
@@ -292,9 +317,13 @@ class Sidebar extends Component {
         array.sort(() => Math.random() - 0.5);
     }
 
+    handleAddPicture(item) {
+        console.log(item);
+    }
+
     renderCreateClassModal() {
         return (
-            <div class="z-40 fixed bottom-0 inset-x-0 px-4 pb-4 sm:inset-0 sm:flex sm:items-center sm:justify-center">
+            <div class="z-20 fixed bottom-0 inset-x-0 px-4 pb-4 sm:inset-0 sm:flex sm:items-center sm:justify-center">
                 <div class="fixed inset-0 transition-opacity">
                     <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
                 </div>
@@ -317,7 +346,7 @@ class Sidebar extends Component {
                                     <input
                                         class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                                         id="grid-first-name" type="text" placeholder="Enter class name..."
-                                        value={this.state.className} onChange={e => this.setClassName(e.target.value)}/>
+                                        value={this.state.className} onChange={e => this.setClassName(e.target.value)} />
                                 </div>
                             </div>
                         </div>
@@ -325,15 +354,15 @@ class Sidebar extends Component {
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                         <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                             <button type="button"
-                                    class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-p-purple text-base leading-6 font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5"
-                                    onClick={() => this.makeClassOnFirebase()}
+                                class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-p-purple text-base leading-6 font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+                                onClick={() => this.makeClassOnFirebase()}
                             >
                                 Get Class Code
                             </button>
                         </span>
                         <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
-                            <button type="button" onClick={() => this.setState({createClassModal: false})}
-                                    class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                            <button type="button" onClick={() => this.setState({ createClassModal: false })}
+                                class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                 Cancel
                             </button>
                         </span>
@@ -368,7 +397,7 @@ class Sidebar extends Component {
                                     <input
                                         class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
                                         id="grid-first-name" type="number" placeholder="Enter class code..."
-                                        value={this.state.className} onChange={e => this.setClassName(e.target.value)}/>
+                                        value={this.state.className} onChange={e => this.setClassName(e.target.value)} />
 
                                 </div>
                             </div>
@@ -377,15 +406,15 @@ class Sidebar extends Component {
                     <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                         <span class="flex w-full rounded-md shadow-sm sm:ml-3 sm:w-auto">
                             <button type="button"
-                                    class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-p-purple text-base leading-6 font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5"
-                                    onClick={() => this.addClassOnFirebase()}
+                                class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-p-purple text-base leading-6 font-medium text-white shadow-sm hover:bg-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5"
+                                onClick={() => this.addClassOnFirebase()}
                             >
                                 Join Class
                             </button>
                         </span>
                         <span class="mt-3 flex w-full rounded-md shadow-sm sm:mt-0 sm:w-auto">
-                            <button type="button" onClick={() => this.setState({addClassModal: false})}
-                                    class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
+                            <button type="button" onClick={() => this.setState({ addClassModal: false })}
+                                class="inline-flex justify-center w-full rounded-md border border-gray-300 px-4 py-2 bg-white text-base leading-6 font-medium text-gray-700 shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition ease-in-out duration-150 sm:text-sm sm:leading-5">
                                 Cancel
                             </button>
                         </span>
@@ -398,22 +427,22 @@ class Sidebar extends Component {
     renderClassesSidebar = () => {
 
         if (!this.state.doc) {
-            return (<div/>)
+            return (<div />)
         }
 
-        const {role} = this.state.doc;
+        const { role } = this.state.doc;
         let classes;
         if (this.state.doc) {
             classes = this.state.doc.classes.map(c => {
                 return (
                     <li>
                         <ClassSelector name={c.name} code={c.code} setClass={this.props.setClass}
-                                       currentClass={this.props.currentClass} setActive={this.props.setActive}/>
+                            currentClass={this.props.currentClass} setActive={this.props.setActive} />
                     </li>
                 )
             });
         } else {
-            classes = <div/>;
+            classes = <div />;
         }
 
         return (
@@ -421,26 +450,32 @@ class Sidebar extends Component {
                 class="fixed z-20 overflow-hidden bg-white mb-4 border-red-light w-full h-screen md:w-24 border-solid border-2 border-gray-200">
                 <div class="flex w-full max-w-xs p-4 bg-white">
                     <ul class="flex flex-col w-full">
+                        <li class="my-px w-12 pb-2">
+                            <Logo />
+                        </li>
+                        <div class="pb-4">
+                            {classes}
+                        </div>
                         <li class="my-px">
                             <a onClick={role === "teacher" ? this.createClass : this.addClass} id="plus-icon-container"
-                               class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-400 bg-gray-100 border-2 border-gray-300 cursor-pointer hover:bg-green-100 hover:border-green-300 hover:text-green-300">
-                                <span class="flex items-center justify-center text-lg">
+                                class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-400 bg-gray-100 border-2 border-gray-300 cursor-pointer hover:bg-green-100 hover:border-green-300 hover:text-green-300">
+                                <span class="flex items-center justify-center py-3 text-lg">
                                     <svg fill="none"
-                                         stroke-linecap="round"
-                                         stroke-linejoin="round"
-                                         stroke-width="2"
-                                         viewBox="0 0 24 24"
-                                         stroke="currentColor"
-                                         class="h-6 w-6"
-                                         id="plus-icon">
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        class="h-6 w-6"
+                                        id="plus-icon">
                                         <path
-                                            d="M8 3.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H4a.5.5 0 0 1 0-1h3.5V4a.5.5 0 0 1 .5-.5z"/>
-                                        <path d="M7.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0V8z"/>
+                                            d="M8 3.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H4a.5.5 0 0 1 0-1h3.5V4a.5.5 0 0 1 .5-.5z" />
+                                        <path d="M7.5 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1H8.5V12a.5.5 0 0 1-1 0V8z" />
                                     </svg>
                                 </span>
                             </a>
                         </li>
-                        {classes}
+
                     </ul>
                 </div>
             </div>
@@ -451,17 +486,17 @@ class Sidebar extends Component {
         if (!this.state.doc) {
             return (
                 <div className="flex justify-center w-full"
-                     style={{
-                         'height': `${window.innerHeight}px`
-                     }}
+                    style={{
+                        'height': `${window.innerHeight}px`
+                    }}
                 >
-                    <div className="self-center lds-dual-ring"/>
+                    <div className="self-center lds-dual-ring" />
                 </div>)
         }
 
-        const {role} = this.state.doc;
+        const { role } = this.state.doc;
 
-        const {currentClass, active} = this.props;
+        const { currentClass, active } = this.props;
         const activeId = active.id;
 
         if (!currentClass) {
@@ -473,16 +508,16 @@ class Sidebar extends Component {
 
         if (this.state.assignments && this.state.assignments.length) {
             assignmentList = this.state.assignments.map(assignment => {
-                const {id, name} = assignment;
+                const { id, name } = assignment;
                 return (
                     <li class="my-px" key={id}>
                         <a onClick={() => {
-                            this.props.setActive({name: 'assignment', id});
+                            this.props.setActive({ name: 'assignment', id });
                         }}
-                           
-                            className={activeId === id ? "flex flex-row items-center px-2 h-12 rounded-lg bg-p-light-purple text-p-purple hover:bg-p-light-purple hover:text-p-purple cursor-pointer"  : "flex flex-row text-gray-600 items-center px-2 h-12 rounded-lg hover:bg-p-light-purple hover:text-p-purple cursor-pointer" }
-                        
-                           >
+
+                            className={activeId === id ? "flex flex-row items-center px-2 h-12 rounded-lg bg-p-light-purple text-p-purple hover:bg-p-light-purple hover:text-p-purple cursor-pointer" : "flex flex-row text-gray-600 items-center px-2 h-12 rounded-lg hover:bg-p-light-purple hover:text-p-purple cursor-pointer"}
+
+                        >
                             <span className="ml-3">{name}</span>
                         </a>
                     </li>);
@@ -491,11 +526,11 @@ class Sidebar extends Component {
 
         if (this.state.chats && this.state.chats.length) {
             chatList = this.state.chats.map(chat => {
-                const {id, name} = chat;
+                const { id, name } = chat;
                 return (
                     <li class="my-px" key={id}>
-                        <a onClick={() => this.props.setActive({name: 'chat', id})}
-                            className={activeId === id ? "flex flex-row items-center px-2 h-12 rounded-lg bg-p-light-purple text-p-purple hover:bg-p-light-purple hover:text-p-purple cursor-pointer"  : "flex flex-row text-gray-600 items-center px-2 h-12 rounded-lg hover:bg-p-light-purple hover:text-p-purple cursor-pointer" }>
+                        <a onClick={() => this.props.setActive({ name: 'chat', id })}
+                            className={activeId === id ? "flex flex-row items-center px-2 h-12 rounded-lg bg-p-light-purple text-p-purple hover:bg-p-light-purple hover:text-p-purple cursor-pointer" : "flex flex-row text-gray-600 items-center px-2 h-12 rounded-lg hover:bg-p-light-purple hover:text-p-purple cursor-pointer"}>
                             <span className="ml-3">{name}</span>
                         </a>
                     </li>);
@@ -504,8 +539,8 @@ class Sidebar extends Component {
 
 
         return (
-            <div style={{width: '300px'}}
-                 class="fixed  overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
+            <div style={{ width: '300px' }}
+                class="fixed  overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
                 <div class="flex max-w-xs p-4 bg-white">
                     <ul class="flex flex-col">
                         <div class="mb-6">
@@ -537,16 +572,16 @@ class Sidebar extends Component {
                         {assignmentList}
 
                         {role === "teacher" ? <li class="my-px">
-                            <a onClick={() => this.props.setActive({name: 'create'})}
-                               class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple cursor-pointer">
+                            <a onClick={() => this.props.setActive({ name: 'create' })}
+                                class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple cursor-pointer">
                                 <span class="flex items-center justify-center text-lg text-p-purple">
                                     <svg fill="none"
-                                         stroke-linecap="round"
-                                         stroke-linejoin="round"
-                                         stroke-width="2"
-                                         viewBox="0 0 24 24"
-                                         stroke="currentColor"
-                                         class="h-6 w-6">
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        class="h-6 w-6">
                                         <path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </span>
@@ -562,15 +597,15 @@ class Sidebar extends Component {
 
                         {role === "teacher" ? <li class="my-px">
                             <a onClick={() => this.createGroupChats()}
-                               class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple cursor-pointer">
+                                class="flex flex-row items-center h-12 px-4 rounded-lg text-p-purple hover:bg-p-light-purple cursor-pointer">
                                 <span class="flex items-center justify-center text-lg text-p-purple">
                                     <svg fill="none"
-                                         stroke-linecap="round"
-                                         stroke-linejoin="round"
-                                         stroke-width="2"
-                                         viewBox="0 0 24 24"
-                                         stroke="currentColor"
-                                         class="h-6 w-6">
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        class="h-6 w-6">
                                         <path d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
                                 </span>
@@ -584,16 +619,16 @@ class Sidebar extends Component {
                                     this.props.history.push("/");
                                 })
                             }}
-                               class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-red-200 cursor-pointer">
+                                class="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-red-200 cursor-pointer">
                                 <span class="flex items-center justify-center text-lg text-red-400"
                                 >
                                     <svg fill="none"
-                                         stroke-linecap="round"
-                                         stroke-linejoin="round"
-                                         stroke-width="2"
-                                         viewBox="0 0 24 24"
-                                         stroke="currentColor"
-                                         class="h-6 w-6">
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                        class="h-6 w-6">
                                         <path
                                             d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
                                     </svg>
