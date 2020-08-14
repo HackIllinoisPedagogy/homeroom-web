@@ -14,7 +14,7 @@ function ClassSelector(props) {
     return (
         <Tooltip title={props.name} placement="right" arrow>
             <div
-                className="h-auto w-full py-3 px-2 flex rounded bg-p-purple text-white justify-center mt-3 hover:shadow hover:border hover:border-p-purple hover:bg-white hover:text-p-purple items-center"
+                className="h-auto w-full py-3 px-2 flex rounded bg-p-purple text-white justify-center mt-3 hover:shadow hover:border hover:border-p-purple hover:bg-white hover:text-p-purple items-center cursor-pointer"
                 onClick={() => {
                     props.setClass({
                         code: props.code,
