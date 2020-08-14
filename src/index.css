@@ -1,13 +1,255 @@
+@font-face {
+  font-family: 'circular-book';
+  src: url(./fonts/circular/lineto-circular-pro-book.ttf);
+}
+
+@font-face {
+  font-family: 'circular-medium';
+  src: url(./fonts/circular/lineto-circular-pro-medium.ttf);
+}
+
+@font-face {
+  font-family: 'circular-bold';
+  src: url(./fonts/circular/lineto-circular-pro-bold.ttf);
+}
+
+@font-face {
+  font-family: 'circular-black';
+  src: url(./fonts/circular/lineto-circular-black.ttf);
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'circular-book', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #F4F8FB;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+#dashboard-inner-container {
+  margin-left: 480px;
+}
+
+/* Position and sizing of burger button */
+.bm-burger-button {
+  position: fixed;
+  width: 36px;
+  height: 30px;
+  left: 36px;
+  top: 36px;
+}
+
+/* Color/shape of burger icon bars */
+.bm-burger-bars {
+  background: #373a47;
+  display: none;
+}
+
+/* Color/shape of burger icon bars on hover*/
+.bm-burger-bars-hover {
+  background: #a90000;
+}
+
+/* Position and sizing of clickable cross button */
+.bm-cross-button {
+  height: 24px;
+  width: 24px;
+  display: none;
+}
+
+/* Color/shape of close button cross */
+.bm-cross {
+  background: #bdc3c7;
+  display: none;
+}
+
+/*
+Sidebar wrapper styles
+Note: Beware of modifying this element as it can break the animations - you should not need to touch it in most cases
+*/
+.bm-menu-wrap {
+  position: fixed;
+  height: 100%;
+}
+
+/* General sidebar styles */
+.bm-menu {
+  background: white;
+  font-size: 1.15em;
+
+}
+
+/* Morph shape necessary with bubble or elastic */
+.bm-morph-shape {
+  fill: #373a47;
+}
+
+/* Wrapper for item list */
+.bm-item-list {
+  color: #b8b7ad;
+  padding: 0.8em;
+}
+
+/* Individual item */
+.bm-item {
+  display: inline-block;
+}
+
+/* Styling of overlay */
+.bm-overlay {
+
+  background: #F4F8FB;
+}
+
+#class-list {
+  padding: none;
+  border-right: #BDBDBD;
+  border-width: 0.1ch;
+  border-top: 0;
+  border-left: 0;
+  border-bottom: 0;
+  border-style: solid;
+}
+
+#side-bar {
+  box-shadow: 0px 4px 20px rgba(168, 168, 168, 0.25);
+  padding-left: 100px;
+
+}
+
+#box {
+  height: 80px;
+  width: 80px;
+  background-color: #BDBDBD;
+  border-radius: 10px;
+
+}
+
+#message-recieved {
+  float: left;
+}
+
+.tooltip .tooltip-text {
+  visibility: hidden;
+  text-align: center;
+  padding: 2px 6px;
+  position: absolute;
+  z-index: 50;
+}
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+}
+
+.toggle-checkbox:checked {
+  @apply: right-0 border-green-400;
+  right: 0;
+  border-color: #68D391;
+}
+.toggle-checkbox:checked + .toggle-label {
+  @apply: bg-green-400;
+  background-color: #68D391;
+}
+
+#message-sent {
+  float: right;
+}
+
+#messages-div ::-webkit-scrollbar {
+  display:none;
+}
+
+::-webkit-scrollbar-track
+{
+  background-color: #F4F8FB;
+}
+
+::-webkit-scrollbar
+{
+    width: 0.4rem;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb
+{
+    background-color: #d9d9d9;
+    border-radius: 0.2rem;
+}
+
+.bg-custom-purple {
+  background-color: #7754F8;
+}
+
+.border-custom-purple {
+  border-color: #7754F8;
+}
+
+.text-custom-purple {
+  color: #7754F8;
+}
+
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid #7754F8;
+  border-color: #7754F8 transparent #7754F8 transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.position-sent-avatar {
+  position: absolute;
+  top: 1.35rem;
+  right: 0.55rem;
+}
+
+.position-received-avatar {
+  position: absolute;
+  top: 1.35rem;
+  left: 0.55rem;
+}
+
+#plus-icon-container {
+  padding-left: 1.3rem;
+  padding-top: 0.5rem;
+}
+
+.announcement-member-container {
+    height: 50%;
+    width: 350px;
+}
+
+.switcher-active-tab {
+    cursor: pointer;
+    color: #000000;
+    font-weight: 600;
+}
+
+.switcher-inactive-tab {
+    cursor: pointer;
+    color: #a0aec0;
 }
