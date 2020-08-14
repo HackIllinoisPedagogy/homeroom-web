@@ -16,6 +16,7 @@ import { findAllInRenderedTree } from "react-dom/test-utils";
 import _ from "lodash";
 import Logo from "../Logo";
 import Dropdown from '../custom/Dropdown';
+import ProfileDropDown from "../ProfileDropDown";
 
 // const assignments = [
 //     { name: 'Problem Set #1' },
@@ -63,8 +64,7 @@ class Sidebar extends Component {
         className: "",
         assignments: null,
         chats: null,
-        active: ""
-
+        active: "",
     };
 
     setAssignments(assignments) {
@@ -537,10 +537,35 @@ class Sidebar extends Component {
             })
         }
 
+        let underClassCode;
+        let profile = "";
+        if(this.props.role === 'teacher') {
+            underClassCode = (
+                <div
+                    className="flex flex-row items-center h-12 px-4 w-auto rounded-lg text-gray-600 bg-p-light-purple">
+                    <span className="ml-3 text-p-purple">{this.props.numStudents} Students</span>
+
+                </div>
+            );
+        } else {
+            underClassCode = (
+                <div
+                    className="transition transition-colors duration-300 flex flex-row items-center h-12 px-4 w-auto
+                    rounded-lg text-gray-600 bg-white text-p-purple hover:bg-p-purple hover:text-white cursor-pointer"
+                    onClick={() => this.props.setShowProfile(true)}
+                >
+                    <span className="ml-3">View Profile</span>
+
+                </div>
+            )
+        }
+
+
+
 
         return (
             <div style={{ width: '300px' }}
-                class="fixed  overflow-hidden shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
+                class="fixed  overflow-y-auto shadow-lg bg-white mb-4 border-red-light w-64 h-screen z-10 ml-24">
                 <div class="flex max-w-xs p-4 bg-white">
                     <ul class="flex flex-col">
                         <div class="mb-6">
@@ -557,20 +582,17 @@ class Sidebar extends Component {
                             </li> : ''}
                         </div>
                         <li class="my-px">
-                            <div
-                                class="flex flex-row items-center h-12 px-4 w-auto rounded-lg text-gray-600 bg-p-light-purple">
-                                <span class="ml-3 text-p-purple">{this.props.numStudents} Students</span>
-
-                            </div>
+                            {underClassCode}
+                            {profile}
                         </li>
 
-                        <li className="my-px">
-                            <a onClick={() => this.props.setActive({name: 'home'})
-                            }
-                               className="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-gray-100">
-                                <span className="ml-3">Home</span>
-                            </a>
-                        </li>
+                        {/*<li className="my-px">*/}
+                        {/*    <a onClick={() => this.props.setActive({name: 'home'})*/}
+                        {/*    }*/}
+                        {/*       className="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-gray-100">*/}
+                        {/*        <span className="ml-3">Home</span>*/}
+                        {/*    </a>*/}
+                        {/*</li>*/}
 
                         <li className="my-px">
                             <span
