@@ -92,7 +92,7 @@ class Dashboard extends Component {
         if(this.state.showProfile) {
             profile = (
                 <div className="absolute top-0 left-0 bg-black-t-50 w-screen h-screen z-50" onClick={() => this.setState({showProfile: false})}>
-                    <ProfileDropDown user={this.state.user}/>
+                    <ProfileDropDown user={this.state.user} currentClass={this.state.currentClass}/>
                 </div>
             )
         }

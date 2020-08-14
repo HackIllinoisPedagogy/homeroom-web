@@ -9,6 +9,7 @@ function ProfileDropDown(props) {
 
     const getAnalytics = async () => {
         const docRefs = (await db.collection("analytics").where("userId", "==", props.user.uid).get()).docs;
+        const classAssignments = (await db.collection("classes").doc(props.currentClass.code + "").get()).data().assignments;
         if(docRefs.length === 0) {
             return;
         }
@@ -20,16 +21,21 @@ function ProfileDropDown(props) {
 
         for (let i = 0; i < docRefs.length; i++) {
             let docRef = docRefs[i];
-            totalTime += docRef.data().timeSubmitted.toDate().getMinutes() - docRef.data().timeStarted.toDate().getMinutes();
-            const problemsRefs = (await getCollection(`analytics/${docRef.id}/problems`)).docs;
-            totalPossible += problemsRefs.length;
-            for(let j = 0; j < problemsRefs.length; j++) {
-                let problem = problemsRefs[j].data();
-                if(problem.isCorrect) {
-                    totalScore++;
+            if(classAssignments.includes(docRef.data().assignmentId)) {
+                totalTime += docRef.data().timeSubmitted.toDate().getMinutes() - docRef.data().timeStarted.toDate().getMinutes();
+                const problemsRefs = (await getCollection(`analytics/${docRef.id}/problems`)).docs;
+                totalPossible += problemsRefs.length;
+                for (let j = 0; j < problemsRefs.length; j++) {
+                    let problem = problemsRefs[j].data();
+                    if (problem.isCorrect) {
+                        totalScore++;
+                    }
+                    totalPolya += problem.polyaCount;
                 }
-                totalPolya += problem.polyaCount;
             }
+        }
+        if(totalScore === 0) {
+            return;
         }
         setGrade(Math.round(totalScore / totalPossible * 100));
         setUsedPolya(totalPolya);
@@ -65,7 +71,7 @@ function ProfileDropDown(props) {
     return (
         <div className="absolute top-0 mt-40 bg-white left-0 ml-32 w-1/5 px-3 py-2 flex flex-col rounded shadow-xl">
             <span>
-                <span className="font-bold">All Classes Grade: </span>{grade}%
+                <span className="font-bold">{props.currentClass.name} Grade: </span>{grade}%
             </span>
             <span>
                 <span className="font-bold">Times used Polya: </span>{usedPolya} times
