@@ -524,6 +524,14 @@ class Sidebar extends Component {
                         </li>
 
                         <li className="my-px">
+                            <a onClick={() => this.props.setActive({name: 'home'})
+                            }
+                               className="flex flex-row items-center h-12 px-4 rounded-lg text-gray-600 hover:bg-gray-100">
+                                <span className="ml-3">Home</span>
+                            </a>
+                        </li>
+
+                        <li className="my-px">
                             <span
                                 className="flex font-medium text-sm text-gray-400 px-2 my-4 uppercase">My Assignments</span>
                         </li>
