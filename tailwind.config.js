@@ -8,7 +8,8 @@ module.exports = {
         'p-orange': 'rgb(223, 80, 110)',
         'p-medium-gray': '#878787',
         'p-dark-blue': '#0a1032',
-        'p-light-blue': '#e3eaf2'
+        'p-light-blue': '#e3eaf2',
+        'black-t-50': 'rgba(0, 0, 0, 0.5)'
       }
     },
   },

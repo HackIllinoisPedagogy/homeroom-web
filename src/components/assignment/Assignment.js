@@ -112,21 +112,6 @@ class StudentForm extends React.Component {
 class Assignment extends React.Component {
     constructor(props) {
         super(props);
-        // let p = new ProblemSet("Assignment 1", [{
-        //     question: "There is a unique positive real number $x$ such that the three numbers $\\log_8{2x}$, $\\log_4{x}$, and $\\log_2{x}$, in that order, form a geometric progression with positive common ratio. The number $x$ can be written as $\\frac{m}{n}$, where $m$ and $n$ are relatively prime positive integers. Find $m + n$.",
-        //     solution: "Since these form a geometric series, $\\frac{\\log_2{x}}{\\log_4{x}}$ is the common ratio. " +
-        //         "Rewriting this, we get $\\frac{\\log_x{4}}{\\log_x{2}} = \\log_2{4} = 2$ by base change formula. " +
-        //         "Therefore, the common ratio is 2. Now $\\frac{\\log_4{x}}{\\log_8{2x}} = 2 \\implies " +
-        //         "\\log_4{x} = 2\\log_8{2} + 2\\log_8{x} \\implies \\frac{1}{2}\\log_2{x} = \\frac{2}{3} + \\frac{2}{3}\\log_2{x}$. " +
-        //         "$\\implies -\\frac{1}{6}\\log_2{x} = \\frac{2}{3} \\implies \\log_2{x} = -4 \\implies x = \\frac{1}{16}$. Therefore, $1 + 16 = \\boxed{017}$."
-        // }, {
-        //     question: "Second problem",
-        //     solution: "eee"
-        // }, {
-        //     question: "third",
-        //     solution: "yeet"
-        // }
-        // ]);
 
         this.state = {
             // problems = props.problems,
@@ -135,16 +120,19 @@ class Assignment extends React.Component {
             listOpen: false,
             answerSet: null,
             submitted: false,
+            submitModal: false,
         };
 
     }
+
+    wrong = [];
 
     timers = [];
     polyaCounts = [];
 
     changeProblem(i) {
         this.timers[this.state.curr_problem].end();
-        if(!this.timers[i].getStart()) {
+        if (!this.timers[i].getStart()) {
             this.timers[i].start();
         }
         this.setState({
@@ -164,7 +152,7 @@ class Assignment extends React.Component {
     }
 
     submitPressed = async () => {
-        const wrong = [];
+        this.wrong = [];
         const attemptRef = await db.collection(`assignments/${this.props.activeAssignmentId}/attempts`).doc(this.props.user.uid).get();
 
         await updateDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
@@ -172,63 +160,130 @@ class Assignment extends React.Component {
         })
 
 
-
         for (let i = 0; i < this.state.problemSet.problems.length; i++) {
             const correct = this.state.problemSet.problems[i].answer;
             if (correct !== this.state.answerSet[i]) {
-                wrong.push(i + 1);
+                this.wrong.push(i + 1);
             }
         }
-        if (wrong.length === 0) {
-            if (window.confirm("You are correct! Would you like to submit?")) {
-                this.timers[this.state.curr_problem].end();
-                const subRef = await addDocument("analytics", {
-                    assignmentId: this.props.activeAssignmentId,
-                    hasSubmitted: true,
-                    timeStarted: this.timers[0].getStart(),
-                    timeSubmitted: this.timers[this.state.curr_problem].getEnd(),
-                    userId: this.props.user.uid,
-                    attempts: attemptRef.data().attempts + 1,
-                });
-                for(let i = this.state.problemSet.problems.length - 1; i >= 0; i--) {
-                    await addDocument(`analytics/${subRef.id}/problems`, {
-                        answer: this.state.answerSet[i],
-                        isCorrect: true,
-                        timeStarted: this.timers[i].getStart(),
-                        timeEnded: this.timers[i].getEnd(),
-                        polyaCount: this.polyaCounts[i],
-                        index: i
-                    })
-                }
-                this.setState({submitted: true});
-                await updateDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
-                    submitted: true,
-                })
-            }
-        } else if(window.confirm(`You got the following problem(s) wrong: ${wrong}. Would you still like to submit?`)) {
-            this.timers[this.state.curr_problem].end();
-            const subRef = await addDocument("analytics", {
-                assignmentId: this.props.activeAssignmentId,
-                hasSubmitted: true,
-                timeStarted: this.timers[0].getStart(),
-                timeSubmitted: this.timers[this.state.curr_problem].getEnd(),
-                userId: this.props.user.uid,
-                attempts: attemptRef.data().attempts + 1
-            });
-            for(let i = this.state.problemSet.problems.length - 1; i >= 0; i--) {
-                await addDocument(`analytics/${subRef.id}/problems`, {
-                    answer: this.state.answerSet[i],
-                    isCorrect: !wrong.includes(i + 1),
-                    timeStarted: this.timers[i].getStart(),
-                    timeEnded: this.timers[i].getEnd(),
-                    polyaCount: this.polyaCounts[i],
-                    index: i
-                })
-            }
-            this.setState({submitted: true});
-            await updateDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
-                submitted: true,
+
+        this.setState({submitModal: true});
+        // if (wrong.length === 0) {
+        //     if (window.confirm("You are correct! Would you like to submit?")) {
+        //         this.timers[this.state.curr_problem].end();
+        //         const subRef = await addDocument("analytics", {
+        //             assignmentId: this.props.activeAssignmentId,
+        //             hasSubmitted: true,
+        //             timeStarted: this.timers[0].getStart(),
+        //             timeSubmitted: this.timers[this.state.curr_problem].getEnd(),
+        //             userId: this.props.user.uid,
+        //             attempts: attemptRef.data().attempts + 1,
+        //         });
+        //         for(let i = this.state.problemSet.problems.length - 1; i >= 0; i--) {
+        //             await addDocument(`analytics/${subRef.id}/problems`, {
+        //                 answer: this.state.answerSet[i],
+        //                 isCorrect: true,
+        //                 timeStarted: this.timers[i].getStart(),
+        //                 timeEnded: this.timers[i].getEnd(),
+        //                 polyaCount: this.polyaCounts[i],
+        //                 index: i
+        //             })
+        //         }
+        //         this.setState({submitted: true});
+        //         await updateDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
+        //             submitted: true,
+        //         })
+        //     }
+        // } else if(window.confirm(`You got the following problem(s) wrong: ${wrong}. Would you still like to submit?`)) {
+        //     this.timers[this.state.curr_problem].end();
+        //     const subRef = await addDocument("analytics", {
+        //         assignmentId: this.props.activeAssignmentId,
+        //         hasSubmitted: true,
+        //         timeStarted: this.timers[0].getStart(),
+        //         timeSubmitted: this.timers[this.state.curr_problem].getEnd(),
+        //         userId: this.props.user.uid,
+        //         attempts: attemptRef.data().attempts + 1
+        //     });
+        //     for(let i = this.state.problemSet.problems.length - 1; i >= 0; i--) {
+        //         await addDocument(`analytics/${subRef.id}/problems`, {
+        //             answer: this.state.answerSet[i],
+        //             isCorrect: !wrong.includes(i + 1),
+        //             timeStarted: this.timers[i].getStart(),
+        //             timeEnded: this.timers[i].getEnd(),
+        //             polyaCount: this.polyaCounts[i],
+        //             index: i
+        //         })
+        //     }
+        //     this.setState({submitted: true});
+        //     await updateDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
+        //         submitted: true,
+        //     })
+        // }
+    }
+
+    async onSubmitModalPressed() {
+        const attemptRef = await db.collection(`assignments/${this.props.activeAssignmentId}/attempts`).doc(this.props.user.uid).get();
+        this.timers[this.state.curr_problem].end();
+        const subRef = await addDocument("analytics", {
+            assignmentId: this.props.activeAssignmentId,
+            hasSubmitted: true,
+            timeStarted: this.timers[0].getStart(),
+            timeSubmitted: this.timers[this.state.curr_problem].getEnd(),
+            userId: this.props.user.uid,
+            attempts: attemptRef.data().attempts
+        });
+        for (let i = this.state.problemSet.problems.length - 1; i >= 0; i--) {
+            await addDocument(`analytics/${subRef.id}/problems`, {
+                answer: this.state.answerSet[i],
+                isCorrect: !this.wrong.includes(i + 1),
+                timeStarted: this.timers[i].getStart(),
+                timeEnded: this.timers[i].getEnd(),
+                polyaCount: this.polyaCounts[i],
+                index: i
             })
+        }
+        this.setState({submitted: true});
+        await updateDocument(`assignments/${this.props.activeAssignmentId}/attempts`, this.props.user.uid, {
+            submitted: true,
+        })
+        this.setState({submitModal: false});
+    }
+
+    renderSubmitModal() {
+        if (this.state.submitModal) {
+            const modalTopText = this.wrong.length > 0 ? "Hold on!" : "Congratulations!";
+            let modalBottomText = "You got all of the problems correct! Would you like to submit?"
+            if (this.wrong.length > 0) {
+                modalBottomText = `You got the following problems wrong: ${this.wrong}. Would you still like to submit?`
+            }
+            return (
+                <div
+                    className="absolute left-0 top-0 bg-black-t-50 w-full h-screen flex justify-center items-center z-50">
+                    <div
+                        className="w-auto h-auto border-p-purple bg-white rounded flex p-5 flex-col justify-center justify-center items-center">
+                        <span className="text-3xl">
+                            {modalTopText}
+                        </span>
+                        <span className="text-xl mt-5">
+                            {modalBottomText}
+                        </span>
+                        <div className="w-full p-5 flex justify-around items-center">
+                            <button className="transition duration-300 bg-white transition-all border-green-400 text-green-400 rounded
+                            hover:shadow hover:border-white hover:bg-green-400 hover:text-white px-2 py-1 text-2xl"
+                                    onClick={async () => {
+                                        await this.onSubmitModalPressed()
+                                    }}>
+                                Submit
+                            </button>
+                            <button className="transition duration-300 bg-white transition-all border-red-400 text-red-400 rounded
+                            hover:shadow hover:border-white hover:bg-red-400 hover:text-white px-2 py-1 text-2xl"
+                                    onClick={() => this.setState({submitModal: false})}>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )
         }
     }
 
@@ -238,7 +293,7 @@ class Assignment extends React.Component {
             this.setProblemSet(new ProblemSet(aRef.name, aRef.problems));
             this.setAnswerSet(new Array(aRef.problems.length));
             let attemptRef = await db.collection(`assignments/${this.props.activeAssignmentId}/attempts`).doc(this.props.user.uid).get();
-            for(let i = 0; i < aRef.problems.length; i++) {
+            for (let i = 0; i < aRef.problems.length; i++) {
                 this.polyaCounts.push(0);
                 this.timers.push(new Timer());
             }
@@ -249,7 +304,7 @@ class Assignment extends React.Component {
                     attempts: 0,
                     submitted: false
                 });
-            } else if(attemptRef.data().submitted){
+            } else if (attemptRef.data().submitted) {
                 this.setState({submitted: true});
             }
         }
@@ -266,7 +321,7 @@ class Assignment extends React.Component {
             let attemptRef = await db.collection(`assignments/${this.props.activeAssignmentId}/attempts`).doc(this.props.user.uid).get();
             this.polyaCounts = [];
             this.timers = [];
-            for(let i = 0; i < aRef.problems.length; i++) {
+            for (let i = 0; i < aRef.problems.length; i++) {
                 this.polyaCounts.push(0);
                 this.timers.push(new Timer());
             }
@@ -286,7 +341,6 @@ class Assignment extends React.Component {
     }
 
 
-
     getProblems(id) {
         const problemSet = getProblemsById(id);
         return <div>{problemSet.name}</div>
@@ -299,8 +353,9 @@ class Assignment extends React.Component {
     onTutorClick() {
         this.polyaCounts[this.state.curr_problem] += 1;
     }
+
     render() {
-        if(this.state.submitted) {
+        if (this.state.submitted) {
             return (
                 <div className="flex flex-col w-full justify-center" style={{height: `${window.innerHeight}px`}}>
                     <span className="self-center text-6xl">
@@ -325,6 +380,7 @@ class Assignment extends React.Component {
 
         return (
             <div id="page">
+                {this.renderSubmitModal()}
                 <div id="content" className="">
                     <div id="pset-title" className="px-16 py-20 w-3/5 float-left">
                         <h3 className="text-black font-bold text-4xl"> {prob.name} </h3>
@@ -357,7 +413,8 @@ class Assignment extends React.Component {
                     <div id="tutor-spacing" className="h-64 float-right w-2/5">
                     </div>
                     <div id="tutor-container" className="h-auto float-right w-2/5 flex justify-center">
-                        <Tutor onTutorClick={() => this.onTutorClick()} assignmentID={this.props.activeAssignmentId} user={this.props.user} problem={prob.problems[this.state.curr_problem]}/>
+                        <Tutor onTutorClick={() => this.onTutorClick()} assignmentID={this.props.activeAssignmentId}
+                               user={this.props.user} problem={prob.problems[this.state.curr_problem]}/>
                     </div>
                 </div>
             </div>

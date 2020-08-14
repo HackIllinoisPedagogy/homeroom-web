@@ -168,7 +168,6 @@ function TeacherAssignment(props) {
         const graphData = [];
 
         analytics.forEach(submission => {
-
             const { timeStarted, timeEnded } = submission.problems.filter(obj => obj.index == problemIndex)[0];
             const mins = getTimeDiff(timeStarted.seconds, timeEnded.seconds);
             graphData.push({ 'Student': submission.name.name, 'Time': mins });
