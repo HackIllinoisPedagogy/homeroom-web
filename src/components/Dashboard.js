@@ -7,6 +7,7 @@ import Sidebar from './sidebar/Sidebar';
 import TeacherAssignment from "./assignment/TeacherAssignment";
 import * as firebase from 'firebase';
 import Home from "./assignment/Home";
+import ProfileDropDown from "./ProfileDropDown";
 
 
 class Dashboard extends Component {
@@ -20,7 +21,10 @@ class Dashboard extends Component {
         currentClass: null,
         numStudents: 0,
         role: "student",
+        showProfile: false,
     }
+
+    setShowProfile = showProfile => this.setState({showProfile});
 
     setNumStudents = n => this.setState({numStudents: n})
 
@@ -84,10 +88,18 @@ class Dashboard extends Component {
             display = <Home user={this.state.user}/>
         }
         // add for All Class once Firebase is in
-
+        let profile = "";
+        if(this.state.showProfile) {
+            profile = (
+                <div className="absolute top-0 left-0 bg-black-t-50 w-screen h-screen z-50" onClick={() => this.setState({showProfile: false})}>
+                    <ProfileDropDown user={this.state.user}/>
+                </div>
+            )
+        }
         return (
             <div className="overflow-y-auto">
-                <Sidebar user={this.state.user} numStudents={this.state.numStudents} active={this.state.active} setActive={this.setActive} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
+                {profile}
+                <Sidebar setShowProfile={this.setShowProfile}role={this.state.role} user={this.state.user} numStudents={this.state.numStudents} active={this.state.active} setActive={this.setActive} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
                 <div id="dashboard-inner-container">
                     {display}
                 </div>
