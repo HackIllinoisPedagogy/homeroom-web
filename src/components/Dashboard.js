@@ -86,7 +86,7 @@ class Dashboard extends Component {
         // add for All Class once Firebase is in
 
         return (
-            <div class="overflow-y-auto">
+            <div className="overflow-y-auto">
                 <Sidebar user={this.state.user} numStudents={this.state.numStudents} active={this.state.active} setActive={this.setActive} history={this.props.history} currentClass={this.state.currentClass} setClass={this.setClass}/>
                 <div id="dashboard-inner-container">
                     {display}

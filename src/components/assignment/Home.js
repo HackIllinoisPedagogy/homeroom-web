@@ -27,7 +27,6 @@ function Home(props) {
             .get()
             .then(function (querySnapshot) {
                 querySnapshot.forEach(function (doc) {
-                    console.log(doc.id, " => ", doc.data());
                     const problems = [];
                     db.collection('analytics').doc(doc.id).collection('problems').get()
                         .then(problem => {
@@ -35,10 +34,8 @@ function Home(props) {
                                 problems.push(problemDoc.data())
                             });
                         });
-                    console.log("problems: ", problems)
                     db.collection('users').doc(doc.data().userId).get().then(nameDoc =>
                         analyticsArray.push({ ...doc.data(), problems, name: nameDoc.data() }))
-                    console.log("Analytics array: " + analyticsArray);
                 });
                 setAnalytics(analyticsArray);
             })
@@ -48,8 +45,6 @@ function Home(props) {
     }
 
     const getAverageScore = (id, stringValue) => {
-        console.log("analytics: ", analytics)
-        //const submission = analytics.filter(obj => (obj.userId === id))[0];
         if (! analytics) {
             return ("");
         }
@@ -63,12 +58,10 @@ function Home(props) {
         if (stringValue) {
             return `${score}/${totalPoints}`;
         }
-        console.log("avg score: ", score/totalPoints);
         return score / totalPoints * 100;
-
     }
 
-    const getAveragePolyaUses = (id) => {
+    const getAveragePolyaUses = () => {
         if (! analytics) {
             return ("");
         }
@@ -80,7 +73,6 @@ function Home(props) {
                 count += problem.polyaCount;
             });
         });
-        console.log("polya uses: " + count)
         return count;
     }
 
@@ -103,23 +95,20 @@ function Home(props) {
         });
     }
 
-    // const style = {
-    //     /* Rectangle 18 */
-    //
-    //     position: absolute,
-    //     width: 286,
-    //     height: 513,
-    //     left: 1104,
-    //     top: 218,
-    //
-    //     background: bg-custom-purple,
-    //     box-shadow: 0px 4px 5px rgba(168, 168, 168, 0.12);
-    //     border-radius: 7px;
-    //
-    // }
+    const getRecentList = (id) => {
+        if (! analytics) {
+            return ("");
+        }
+
+        const recents = analytics.filter(obj => (obj.userId === id))[0];
+        console.log("recent assignments: ",  recents);
+    }
+
     return (
-        <div className="py-8 w-3/5 float-left">
+        <div>
+        <div className="px-16 py-20 float-left">
             <h1 className="text-black font-bold text-4xl">Home</h1>
+            <h2 className="text-grey-700 text-xl pb-3">Welcome, props.user</h2>
             <div className="bg-white shadow overflow-hidden sm:rounded-lg border-b border-gray-200 sm:px-6 p-3">
                 <div className="float-left">
                     <h3 className="text-grey-900 font-bold text-2xl">Grade</h3>
@@ -129,9 +118,26 @@ function Home(props) {
                     <h3 className="text-grey-900 font-bold text-2xl">Polya Used</h3>
                     <div>{analytics ? getAveragePolyaUses() + " times" : "none"}</div>
                 </div>
-                <div className="float-right">
+                <div className="float-right pl-10">
                     <h3 className="text-grey-900 font-bold text-2xl">Average Time Taken</h3>
                     <div>{analytics ? getTimeDiff() + " minutes" : "none"}</div>
+                </div>
+            </div>
+            <div>
+                <h2 className="text-black font-bold text-2xl pt-5">Recently Completed</h2>
+
+            </div>
+        </div>
+            <div className="py-48 pr-16">
+                <div className="max-w-sm rounded overflow-hidden shadow-lg">
+                    {/*<img className="w-full" src="" alt="proile pic"/>*/}
+                    <div className="px-6 py-4">
+                        <div className="font-bold text-xl mb-2">About You</div>
+                        <p className="text-gray-700 text-base">
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptatibus quia, nulla! Maiores
+                            et perferendis eaque, exercitationem praesentium nihil.
+                        </p>
+                    </div>
                 </div>
             </div>
 
