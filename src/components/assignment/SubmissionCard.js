@@ -5,9 +5,9 @@ function SubmissionCard(props) {
     if(props.percent > 80){
         name+="text-green-500";
     }else if(props.percent > 70){
-        name+="text-yellow-400" 
+        name+="text-yellow-600" 
     }else{
-        name+="text-red-400" 
+        name+="text-red-400"
     }
     return (
         <div className="py-4 mb-2 px-4 mt-1 w-full rounded bg-white shadow-sm flex justify-between">
