@@ -68,7 +68,7 @@ function SignUp(props) {
             >
                 <Logo width={50} height={50}/>
                 <span className="ml-4 text-4xl font-bold">
-                    Pedagogy
+                    Homeroom
                 </span>
             </div>
             <div className="w-full justify-center flex flex-col  p-3" style={{'height': '90%',}}>
